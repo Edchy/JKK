@@ -1,0 +1,477 @@
+{
+  "exercises": [
+    {
+      "id": "wide-stance",
+      "name": "Wide stance",
+      "subtitle": "Dynamisk stretch för ljumskarna",
+      "animals": [
+        "apa"
+      ],
+      "tags": [
+        "stretch"
+      ],
+      "images": 1,
+      "dose": "Cirka 50 studsar",
+      "video": "ikqKadF65X8",
+      "text": [
+        "Stå med fötterna brett isär och lätt utåtvridna. Greppa marken lätt med fötterna och tårna.",
+        "Böj knäna och fäll överkroppen framåt. Sätt armbågarna som stöd på insidan av knäna och låt händerna gå ner mot fötterna.",
+        "Gör försiktigt små, korta studsar upp och ner för att mjuka upp ljumskarna. Gör cirka 50 studsar. Börja mjukt och öka intensiteten gradvis, med bibehållen kontroll. Anpassa djupet efter din rörlighet."
+      ],
+      "coach": {
+        "intro": [
+          "Vi börjar mjukt, med wide stance. Den här öppnar upp ljumskarna."
+        ],
+        "guide": [
+          {
+            "step": 0,
+            "text": "Ställ dig brett, med tårna lite utåt. Låt fötterna greppa golvet, lätt. Känn att du står stadigt."
+          },
+          {
+            "step": 1,
+            "text": "Böj på knäna och fäll överkroppen framåt. Armbågarna vilar mot insidan av knäna, och händerna sjunker ner mot fötterna."
+          },
+          {
+            "step": 2,
+            "text": "Och nu, små mjuka studsar. Inga ryck. Låt ljumskarna mjukna, lite i taget."
+          },
+          {
+            "step": 2,
+            "text": "Sikta på ungefär femtio studsar. Börja försiktigt, och öka bara om det känns bra."
+          }
+        ],
+        "cues": [
+          "Andas lugnt. Låt axlarna vara avslappnade.",
+          "Bra. Håll rytmen, mjukt och kontrollerat.",
+          "Gå inte djupare än det känns skönt. Du har gott om tid.",
+          "Snyggt. Bara några till, om du orkar."
+        ]
+      }
+    },
+    {
+      "id": "hamstrings",
+      "name": "Hamstrings",
+      "subtitle": "Dynamisk stretch för baksida lår",
+      "animals": [
+        "apa"
+      ],
+      "tags": [
+        "stretch"
+      ],
+      "images": 1,
+      "dose": "Totalt 50 studsar",
+      "text": [
+        "Stå med fötterna ungefär höftbrett isär. Böj knäna lätt och fäll överkroppen framåt. Låt huvudet och armarna hänga avslappnat.",
+        "Gör 25 små, mjuka studsar med lätt böjda knän. Halvvägs genom övningen börjar du sträcka ut benen och fortsätter med 25 studsar med sträckta ben. Låt händerna gradvis nå längre fram, bort från fötterna, medan du studsar.",
+        "Anpassa djupet efter din rörlighet - händerna behöver inte nå golvet. Börja mjukt och behåll kontrollen."
+      ]
+    },
+    {
+      "id": "sidostretch",
+      "name": "Sidostretch",
+      "subtitle": "Dynamisk stretch för underkroppen",
+      "animals": [
+        "apa"
+      ],
+      "tags": [
+        "stretch"
+      ],
+      "images": 1,
+      "dose": "Ca 50 studsar per sida",
+      "video": "8SPsgwOM5Ow",
+      "focus": "Insida lår (adduktorer), baksida lår (hamstrings) samt vad- och hälseneregionen. Var stretchen känns beror på fotens position, djupet och din rörlighet.",
+      "text": [
+        "Stå brett med fötterna riktade framåt och sätt händerna i marken framför dig. Om du behöver stöd kan du placera händerna på en stadig stol framför dig.",
+        "För vikten åt ena sidan och böj det benet medan det andra benet sträcks. Låt det böjda knäet följa tårnas riktning.",
+        "Gör små, mjuka studsar upp och ner. Halvvägs genom studsarna på varje sida kan du låta framfoten på det utsträckta benet lyfta, så att hälen är kvar i marken och tårna pekar rakt upp mot taket.",
+        "Gå bara så djupt som känns bekvämt - du behöver inte komma lika långt ner som på bilden. Börja försiktigt och behåll kontrollen utan att pressa fram djupet. Gör totalt ca 50 studsar per sida."
+      ]
+    },
+    {
+      "id": "swinging-front-kicks",
+      "name": "Swinging front kicks",
+      "subtitle": "Raka bensving framåt",
+      "animals": [
+        "apa"
+      ],
+      "tags": [
+        "stretch",
+        "sparkar"
+      ],
+      "images": 1,
+      "dose": "10 svingar per ben",
+      "video": "WtDhyU1hWQ4",
+      "extraVideos": [
+        {
+          "id": "xYlpF2ke5wo",
+          "title": "Variant med steg"
+        }
+      ],
+      "text": [
+        "Stå upprätt med rak rygg, nacke och hals. Sträck armarna rakt ut åt sidorna i axelhöjd och öppna upp bröstkorgen utan att svanka.",
+        "Svinga ett ben rakt framåt och uppåt och låt det sedan återvända kontrollerat. Håll benen utsträckta genom hela rörelsen, utan att översträcka knäna.",
+        "Svinga bara så högt att överkroppen förblir rak och stilla. Börja med låga svingar och öka höjden gradvis så länge du behåller kontrollen. Gör 10 svingar per ben."
+      ]
+    },
+    {
+      "id": "knacirklar",
+      "name": "Knäcirklar",
+      "subtitle": "Rörlighet för höfterna",
+      "animals": [
+        "apa"
+      ],
+      "tags": [],
+      "images": 1,
+      "dose": "5 cirklar åt varje håll per ben",
+      "video": "i1k6rq46y4M",
+      "text": [
+        "Stå upprätt med rak rygg, nacke och hals. Sträck armarna rakt ut åt sidorna i axelhöjd och öppna upp bröstkorgen utan att svanka.",
+        "Lyft ett ben med böjt knä. För knäet inåt mot motsatt hand och låt det sedan röra sig utåt i en stor cirkel framför kroppen. Med vänster knä börjar du alltså mot höger hand; med höger knä börjar du mot vänster hand.",
+        "Gör 5 cirklar inifrån och ut. Vänd sedan riktningen och gör 5 cirklar utifrån och in. Upprepa med det andra benet.",
+        "Håll överkroppen rak och stilla. Anpassa cirkelns storlek så att du behåller balansen och kontrollen."
+      ]
+    },
+    {
+      "id": "bear-walk",
+      "name": "Bear Walk",
+      "subtitle": "Kontrollerad förflyttning på alla fyra",
+      "animals": [
+        "apa",
+        "bjorn"
+      ],
+      "tags": [
+        "bal"
+      ],
+      "images": 1,
+      "dose": "1 minut",
+      "text": [
+        "Börja på alla fyra med händerna under axlarna och knäna under höfterna. Aktivera bålen och lyft knäna en liten bit från golvet. Ta korta steg med motsatt hand och fot. Håll ryggen jämn och rör dig lugnt framåt och bakåt."
+      ],
+      "variations": [
+        {
+          "label": "Enklare",
+          "text": "Behåll knäna i golvet och lyft en hand eller fot i taget."
+        },
+        {
+          "label": "Avancerat",
+          "text": "Rör dig framåt och bakåt med tre stödpunkter: två händer och en fot, eller två fötter och en hand. Håll den fjärde kroppsdelen lyft och byt sida halvvägs genom övningen. Anpassa stegen så att du behåller balansen och kontrollen."
+        }
+      ]
+    },
+    {
+      "id": "mabu-med-sidoslag",
+      "name": "Mabu med sidoslag",
+      "subtitle": "Svepande rörelse från sida till sida",
+      "animals": [
+        "bjorn",
+        "tiger"
+      ],
+      "tags": [
+        "mabu",
+        "slag",
+        "stav"
+      ],
+      "images": 1,
+      "dose": "1 minut",
+      "video": "KdORdTGO7UE",
+      "text": [
+        "Stå med fötterna brett isär och riktade rakt framåt. Böj knäna till en djup Mabu, men bara så djupt att du kan hålla ryggen rak och överkroppen upprätt utan att luta framåt. Låt knäna följa tårnas riktning.",
+        "Höj händerna åt sidan som på bilden. Andas in och aktivera bålen och bäckenet lätt. Börja rörelsen med en aktivering och rotation i höften. Låt överkroppen och armarna följa med i ett kontrollerat, svepande sidoslag i horisontell riktning. Andas ut samtidigt som du slår.",
+        "Upprepa från sida till sida med båda händerna, med eller utan stav. Ett kvastskaft kan användas som alternativ. Behåll kontrollen och stå högre om du behöver."
+      ]
+    },
+    {
+      "id": "kung-fu-pushups",
+      "name": "Kung Fu Pushups",
+      "subtitle": "Armhävningar med paus",
+      "animals": [
+        "bjorn"
+      ],
+      "tags": [],
+      "images": 1,
+      "dose": "1 minut",
+      "text": [
+        "Placera händerna strax bredare än axlarna. Börja med raka, utsträckta armar. Håll kroppen i en lång linje, med rak nacke och hals och blicken mot golvet.",
+        "Håll axlar och skuldror nere, bort från öronen. Skapa ett lätt utåtvridande tryck genom händerna, med rotationen från skuldrorna, utan att händerna glider.",
+        "Andas in och spänn bålen. Sänk kroppen med kontroll, pausa 3 sekunder i botten och pressa sedan upp. Andas ut på vägen upp.",
+        "Sikta på ungefär 50-80 % av det antal repetitioner du maximalt klarar med samma teknik och paus under en minut. Vila mellan repetitionerna tills du känner att du kan fortsätta med god kontroll. Avsluta med känslan att du hade kunnat göra lite mer."
+      ],
+      "variations": [
+        {
+          "label": "Enklare",
+          "text": "Sätt knäna i golvet eller placera händerna mot en stadig möbel som inte kan glida eller välta."
+        }
+      ]
+    },
+    {
+      "id": "assisted-cossack",
+      "name": "Assisted Cossack",
+      "subtitle": "Dynamisk stretch",
+      "animals": [
+        "apa"
+      ],
+      "tags": [
+        "stretch"
+      ],
+      "images": 1,
+      "video": "5Aa_mwdKuu4",
+      "steps": [
+        {
+          "bild": [
+            1
+          ],
+          "title": "Utgångsläge",
+          "text": "Sitt i djup huk med händerna i golvet framför dig. Ta stöd av en stol eller pall om du behöver. Sätt ned hälarna i golvet om du kan, annars sitt på tå. Se till att knäna pekar åt samma håll som tårna."
+        },
+        {
+          "bild": [
+            2
+          ],
+          "title": "Avlasta benen",
+          "text": "För vikten över på händerna och lyft höften för att flytta fötterna."
+        },
+        {
+          "bild": [
+            3
+          ],
+          "title": "Sträck åt sidan",
+          "text": "Sjunk ned över det böjda benet. Sträck det andra benet åt sidan med hälen i golvet och tårna uppåt."
+        },
+        {
+          "bild": [
+            4
+          ],
+          "title": "Växla sida",
+          "text": "Använd händerna som stöd när du byter sida. Rör dig mjukt och kontrollerat och andas lugnt."
+        }
+      ]
+    },
+    {
+      "id": "axe-kicks",
+      "name": "Axe Kicks",
+      "subtitle": "Dynamisk stretch",
+      "animals": [
+        "apa",
+        "tiger"
+      ],
+      "tags": [
+        "stretch",
+        "sparkar"
+      ],
+      "images": 1,
+      "video": "O8e1B53smUk",
+      "steps": [
+        {
+          "bild": [
+            1
+          ],
+          "title": "Utgångsläge",
+          "text": "Stå i fight stance med vänster ben fram och höger ben bak. Håll händerna i gard."
+        },
+        {
+          "bild": [
+            2
+          ],
+          "title": "Svinga upp",
+          "text": "Svinga det bakre, högra benet sträckt snett framåt och uppåt åt din vänster."
+        },
+        {
+          "bild": [
+            3
+          ],
+          "title": "För benet till mitten",
+          "text": "När benet når toppen av svingen för du det åt höger tills det är framför kroppens mittlinje. Föreställ dig att benet går runt motståndarens gard."
+        },
+        {
+          "bild": [
+            4
+          ],
+          "title": "Svinga ned",
+          "text": "Svinga benet kraftfullt och kontrollerat nedåt med hälen först. Föreställ dig att hälen träffar motståndaren ovanifrån över huvudet."
+        },
+        {
+          "bild": [
+            5
+          ],
+          "title": "För vikten framåt",
+          "text": "Låt kroppsvikten följa rörelsen framåt och ge kraft åt nedsättningen. Landa stabilt med händerna kvar i gard. Upprepa på båda sidor."
+        }
+      ]
+    },
+    {
+      "id": "get-ups",
+      "name": "Get Ups",
+      "subtitle": "Bål och rörlighet",
+      "animals": [
+        "apa",
+        "bjorn"
+      ],
+      "tags": [
+        "bal"
+      ],
+      "images": 1,
+      "video": "LqQs47S0yC4",
+      "steps": [
+        {
+          "bild": [
+            1
+          ],
+          "title": "Utgångsläge",
+          "text": "Ligg på rygg med armarna snett ut åt sidorna och händerna i golvet."
+        },
+        {
+          "bild": [
+            2
+          ],
+          "title": "Förbered uppresningen",
+          "text": "Dra in ena foten nära rumpan och sätt fotsulan i golvet. Lyft handen på samma sida som försvar."
+        },
+        {
+          "bild": [
+            3,
+            4
+          ],
+          "title": "Tryck dig upp",
+          "text": "Tryck foten ned i golvet och för höften snett uppåt. Kom först upp på motsatt armbåge och sedan på handen med utsträckt stödarm."
+        },
+        {
+          "bild": [
+            5
+          ],
+          "title": "Fäll in benet",
+          "text": "För det utsträckta benet in under kroppen och sätt ned knät nära stödhanden."
+        },
+        {
+          "bild": [
+            6,
+            7
+          ],
+          "title": "Kom upp och backa",
+          "text": "Kom upp i en hukande ställning. Backa sedan till fight stance med händerna i gard."
+        }
+      ],
+      "text": [
+        "Håll den fria handen uppe som försvar under uppresningen. Upprepa på båda sidor."
+      ]
+    },
+    {
+      "id": "dynamic-squat",
+      "name": "Dynamic Squat: Step to Mabu",
+      "subtitle": "Steg till mabu med sidoslag",
+      "animals": [
+        "bjorn",
+        "tiger"
+      ],
+      "tags": [
+        "mabu",
+        "slag",
+        "stav"
+      ],
+      "images": 2,
+      "dose": "30–60 sekunder per set",
+      "video": "8j2OTxcXRU4",
+      "steps": [
+        {
+          "bild": [
+            1
+          ],
+          "title": "Utgångsläge",
+          "text": "Stå med fötterna brett isär och knäna böjda. Håll ryggen upprätt och staven snett framför kroppen."
+        },
+        {
+          "bild": [
+            2,
+            3
+          ],
+          "title": "För staven uppåt",
+          "text": "För staven upp framför kroppen till ett lodrätt läge. Låt händerna följa och styra rörelsen."
+        },
+        {
+          "bild": [
+            4
+          ],
+          "title": "Byt handläge",
+          "text": "För den främre handen nedåt framför staven. Den bakre handen är högre upp och bakom staven."
+        },
+        {
+          "bild": [
+            5,
+            6
+          ],
+          "title": "Samla steget",
+          "text": "För över vikten till stödbenet och lyft den andra foten lätt från golvet. Samla steget medan staven följer med framför kroppen."
+        },
+        {
+          "bild": [
+            7
+          ],
+          "title": "Vänd och svep",
+          "text": "Kliv vidare och låt fötter, höfter och överkropp följa vändningen. För staven i ett svep åt sidan, över framför bröstet."
+        },
+        {
+          "bild": [
+            8
+          ],
+          "title": "Sjunk ned i mabu",
+          "text": "Sätt ned foten och sjunk ned med böjda knän. Behåll en upprätt rygg och låt stavrörelsen avslutas tillsammans med steget."
+        }
+      ],
+      "text": [
+        "Fortsätt rörelsen åt andra hållet. Träna i 30-60 sekunder per set."
+      ]
+    },
+    {
+      "id": "kick-through",
+      "name": "Kick Through",
+      "subtitle": "Bål och rörlighet",
+      "animals": [
+        "apa",
+        "bjorn"
+      ],
+      "tags": [
+        "bal"
+      ],
+      "images": 0,
+      "video": "7cUaLmelvUk",
+      "text": [
+        "Följ genomgången i videon. Rör dig mjukt och kontrollerat, och anpassa rörelsen efter din nivå."
+      ]
+    },
+    {
+      "id": "mabu-staff-switch",
+      "name": "Isometric Squat: Mabu & Staff Switch",
+      "subtitle": "Statisk mabu med stavbyte",
+      "animals": [
+        "bjorn",
+        "tiger"
+      ],
+      "tags": [
+        "mabu",
+        "stav"
+      ],
+      "images": 0,
+      "video": "s02_pJAFb1w",
+      "text": [
+        "Följ genomgången i videon. Stå bara så djupt i mabu att du kan hålla ryggen rak och överkroppen upprätt. Låt knäna följa tårnas riktning."
+      ]
+    },
+    {
+      "id": "dynamic-squat-mabu",
+      "name": "Dynamic Squat: Mabu & Side Strikes",
+      "subtitle": "Dynamisk mabu med sidoslag",
+      "animals": [
+        "bjorn",
+        "tiger"
+      ],
+      "tags": [
+        "mabu",
+        "slag"
+      ],
+      "images": 0,
+      "video": "hRCo_iQejIs",
+      "text": [
+        "Följ genomgången i videon. Behåll en upprätt rygg genom hela rörelsen och låt knäna följa tårnas riktning. Stå högre om du behöver."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "school": "Järna Kung Fu & Kultur",
+  "program": "Kung Fu Fitness",
+  "principles": [
+    {
+      "title": "Träna lite och ofta",
+      "steps": [
+        "Välj din egen nivå och prioritera god teknik.",
+        "Träna inte till max - avsluta med känslan att du hade kunnat göra lite mer.",
+        "Vila när du behöver, även under en övningsminut.",
+        "Anpassa rörelserna efter dina förutsättningar.",
+        "Rörelserna ska inte göra ont."
+      ]
+    },
+    {
+      "title": "Hållning och stabilitet",
+      "steps": [
+        {
+          "title": "Lång och stabil hållning",
+          "text": "I upprätt stående: tänk huvudet ovanpå axlarna, axlarna ovanpå höften och höften ovanför fötternas stödyta."
+        },
+        {
+          "title": "Följ rörelsen",
+          "text": "När övningen kräver att du lutar eller roterar kroppen följer hållningen med rörelsen."
+        },
+        {
+          "title": "Aktivera bålen lätt",
+          "text": "Träna med avsikten att utveckla en hållning som stödjer hälsa och kroppskontroll. Aktivera bålen lätt för att stabilisera kroppen."
+        },
+        {
+          "title": "Tippa bäckenet lätt bakåt",
+          "text": "Tänk att du försiktigt lyfter bäckenets framsida och minskar svanken. Det ska kännas som en aktivering, inte som att du spänner dig maximalt."
+        },
+        {
+          "title": "Greppa golvet med foten",
+          "text": "När fötterna är i marken, behåll kontakten genom hälen och trampdynan och låt tårna greppa golvet lätt, utan att krampa eller krumma dem hårt. Det hjälper dig att aktivera foten och skapa en stabil grund för knän och resten av kroppen."
+        }
+      ]
+    }
+  ],
+  "animals": [
+    {
+      "id": "apa",
+      "name": "Apa",
+      "glyph": "猴",
+      "theme": "Rörlighet",
+      "description": "Stretch och mobilitet för en smidig, rörlig kropp."
+    },
+    {
+      "id": "bjorn",
+      "name": "Björn",
+      "glyph": "熊",
+      "theme": "Styrka",
+      "description": "Styrka, stabilitet och en stark bål."
+    },
+    {
+      "id": "tiger",
+      "name": "Tiger",
+      "glyph": "虎",
+      "theme": "Färdighet",
+      "description": "Teknik: ställningar, slag, sparkar och stav."
+    }
+  ],
+  "tags": [
+    {
+      "id": "stretch",
+      "name": "Stretch"
+    },
+    {
+      "id": "bal",
+      "name": "Bål"
+    },
+    {
+      "id": "mabu",
+      "name": "Mabu"
+    },
+    {
+      "id": "sparkar",
+      "name": "Sparkar"
+    },
+    {
+      "id": "slag",
+      "name": "Slag"
+    },
+    {
+      "id": "stav",
+      "name": "Stav"
+    }
+  ],
+  "passes": [
+    {
+      "id": "pass-1",
+      "title": "Pass 1",
+      "exercises": [
+        "wide-stance",
+        "hamstrings",
+        "sidostretch",
+        "swinging-front-kicks",
+        "knacirklar",
+        "bear-walk",
+        "mabu-med-sidoslag",
+        "kung-fu-pushups"
+      ],
+      "coach": {
+        "welcome": [
+          "Hej, och välkommen.",
+          "Idag kör vi pass ett. Åtta övningar, och vi tar dem en i taget.",
+          "Ta det lugnt, och lyssna på kroppen. Det ska kännas bra, aldrig göra ont."
+        ],
+        "finish": [
+          "Där satt den.",
+          "Bra jobbat idag. Ta ett par djupa andetag, och ta med dig känslan resten av dagen."
+        ]
+      }
+    },
+    {
+      "id": "pass-2",
+      "title": "Pass 2",
+      "exercises": [
+        "assisted-cossack",
+        "axe-kicks",
+        "get-ups",
+        "dynamic-squat"
+      ]
+    }
+  ],
+  "coach": {
+    "howToVoice": "Kör i din egen takt. När du känner dig klar säger du bara färdig, så går vi vidare tillsammans.",
+    "howToTap": "Kör i din egen takt. När du känner dig klar trycker du på färdig, så går vi vidare tillsammans.",
+    "transitions": [
+      "Snyggt jobbat. Skaka loss lite.",
+      "Bra. Andas ut ordentligt.",
+      "Fint. Ta en kort paus om du behöver.",
+      "Härligt. Vi fortsätter."
+    ],
+    "last": "Nu är det sista övningen. Ge den lite extra fokus."
+  }
+}

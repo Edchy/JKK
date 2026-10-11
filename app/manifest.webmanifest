@@ -1,0 +1,16 @@
+{
+  "name": "Kung Fu Fitness – Järna Kung Fu & Kultur",
+  "short_name": "Kung Fu",
+  "description": "Hemmaträning från Järna Kung Fu & Kultur",
+  "lang": "sv",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fbc213",
+  "theme_color": "#fbc213",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

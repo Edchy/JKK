@@ -1,0 +1,37 @@
+{
+  "terms": [
+    {
+      "term": "Mabu",
+      "native": "馬步",
+      "text": "Hästställning. Fötterna brett isär och riktade framåt, knäna böjda som om du satt på en häst. Ryggen rak och överkroppen upprätt. Grundställningen i kung fu – bygger styrka och stabilitet.",
+      "match": [
+        "mabu"
+      ]
+    },
+    {
+      "term": "Fight stance",
+      "text": "Kampställning. Ena benet fram och det andra bak, lätt böjda knän och händerna i gard.",
+      "match": [
+        "fight stance"
+      ]
+    },
+    {
+      "term": "Gard",
+      "text": "Händerna uppe framför kroppen och ansiktet för att skydda dig.",
+      "match": [
+        "gard"
+      ]
+    },
+    {
+      "term": "Apa, Björn och Tiger",
+      "text": "Skolans tre teman. Apa står för rörlighet, Björn för styrka och Tiger för färdighet – teknik som ställningar, slag, sparkar och stav."
+    },
+    {
+      "term": "Adduktorer",
+      "text": "Musklerna på insidan av låret.",
+      "match": [
+        "adduktorer"
+      ]
+    }
+  ]
+}
