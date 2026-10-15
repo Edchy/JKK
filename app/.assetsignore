@@ -1,0 +1,4 @@
+# Not published to Cloudflare (see wrangler.jsonc).
+# The test page talks to the live agent with no consent sheet – local only.
+coach-test.html
+.assetsignore

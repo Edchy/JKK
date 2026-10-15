@@ -125,8 +125,7 @@
     }
   ],
   "coach": {
-    "howToVoice": "Kör i din egen takt. När du känner dig klar säger du bara färdig, så går vi vidare tillsammans.",
-    "howToTap": "Kör i din egen takt. När du känner dig klar trycker du på färdig, så går vi vidare tillsammans.",
+    "howTo": "Kör i din egen takt. När du känner dig klar trycker du på nästa, så går vi vidare tillsammans.",
     "transitions": [
       "Snyggt jobbat. Skaka loss lite.",
       "Bra. Andas ut ordentligt.",
@@ -134,5 +133,90 @@
       "Härligt. Vi fortsätter."
     ],
     "last": "Nu är det sista övningen. Ge den lite extra fokus."
+  },
+  "privacy": {
+    "draft": "Utkast skrivet av Claude – granska. 'owner' = ditt namn (du driver appen som privatperson), 'contact' = hur man når dig. Tomt 'owner' visas som 'appens ägare'. 'days' ska matcha Conversations Retention Period i ElevenLabs.",
+    "contact": "hello@thinksmall.studio",
+    "days": 30,
+    "live": {
+      "title": "Innan du pratar med coachen",
+      "points": [
+        "Live-coachen är en AI. Det du säger skickas till ElevenLabs och en AI-modell från Anthropic, som tolkar det och svarar med röst. Båda är företag i USA.",
+        "Ljudet sparas inte. En textversion av samtalet sparas i {days} dagar så att coachen kan förbättras, sedan raderas den.",
+        "Appen har inga konton, så du är anonym. Säg inte ditt namn eller annat privat i samtalet.",
+        "Vill du hellre inte? Välj inspelad röst eller tyst – de skickar ingenting."
+      ],
+      "accept": "Jag förstår, starta",
+      "or": "Eller utan live-coach:"
+    },
+    "title": "Integritet",
+    "sections": [
+      {
+        "title": "Kort sagt",
+        "text": "Appen har inga konton, ingen spårning och inga kakor. Det enda appen sparar är dina val i inställningarna – och det ligger bara i din telefon."
+      },
+      {
+        "title": "Live-coachen",
+        "text": "När du pratar med live-coachen skickas din röst till ElevenLabs, som gör om den till text och svarar med röst. Svaren formuleras av en AI-modell från Anthropic. Båda är företag i USA. Ljudet sparas inte. Samtalet sparas som text i {days} dagar så att coachen kan förbättras, sedan raderas det. Live-coachen används bara om du har godkänt det, och du kan ångra dig när som helst – inspelad röst och tyst skickar ingenting.",
+        "liveOnly": true
+      },
+      {
+        "title": "Videor",
+        "text": "Videorna kommer från YouTube och laddas först när du trycker på en video. Då får YouTube din IP-adress."
+      },
+      {
+        "title": "Vem driver appen?",
+        "text": "Appen drivs av {owner} som privatperson och är inte kopplad till Järna Kung Fu & Kultur. Det är {owner} som ansvarar för uppgifterna som beskrivs här. Vill du veta vad som har sparats om dig, eller få det raderat? Kontakta {contact} och berätta ungefär när du tränade. Du kan också vända dig till Integritetsskyddsmyndigheten (IMY)."
+      }
+    ],
+    "withdraw": "Ångra godkännandet för live-coachen",
+    "owner": "",
+    "link": "Integritet"
+  },
+  "install": {
+    "draft": "Utkast skrivet av Claude – granska. {share}, {dots}, {dots-v}, {add}, {phone} visar ikonen på den platsen. Varje steg kan få en skärmdump: lägg bilden i app/img/install/ och skriv \"img\": \"install/namn.webp\" på steget.",
+    "title": "Installera appen",
+    "lead": "Spara appen på hemskärmen så öppnas den som en vanlig app – i helskärm, och övningarna fungerar utan internet.",
+    "installed": "Du använder redan appen från hemskärmen. Snyggt.",
+    "now": "Installera nu",
+    "ios": [
+      {
+        "text": "Öppna sidan i **Safari**."
+      },
+      {
+        "text": "Tryck på **dela-knappen** {share} längst ned på skärmen. Ser du den inte? Tryck först på **⋯** {dots}."
+      },
+      {
+        "text": "Scrolla ned i listan och tryck på **Lägg till på hemskärmen** {add}."
+      },
+      {
+        "text": "Tryck på **Lägg till** uppe till höger."
+      },
+      {
+        "text": "Klart! Öppna **Kung Fu** från hemskärmen."
+      }
+    ],
+    "android": [
+      {
+        "text": "Öppna sidan i **Chrome**."
+      },
+      {
+        "text": "Tryck på **menyn** {dots-v} uppe till höger."
+      },
+      {
+        "text": "Tryck på **Installera app** eller **Lägg till på startskärmen**."
+      },
+      {
+        "text": "Tryck på **Installera**."
+      },
+      {
+        "text": "Klart! Öppna **Kung Fu** från startskärmen."
+      }
+    ],
+    "banner": {
+      "text": "Spara den på hemskärmen – då öppnas den som en vanlig app och övningarna fungerar utan internet.",
+      "how": "Visa hur",
+      "install": "Installera"
+    }
   }
 }

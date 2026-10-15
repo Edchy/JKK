@@ -101,7 +101,7 @@ function sampleLines() {
   const pass = passes[0];
   const list = pass.exercises.map((id) => exercises.find((e) => e.id === id)).filter(Boolean);
   const ex = list[0];
-  const said = exerciseLines({ pass, coach, ex, i: 0, n: list.length, first: true, canListen: true });
+  const said = exerciseLines({ pass, coach, ex, i: 0, n: list.length, first: true });
   return [...new Set([...said.map((l) => l.text), ...cueLines(ex), ...finished(pass, coach)])];
 }
 const lines = sample ? sampleLines() : allLines({ passes, exercises, coach });

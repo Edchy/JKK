@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coach-test</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    main { padding-top: 32px; }
+    #log { display: grid; gap: 10px; margin: 24px 0; }
+    .msg { max-width: 85%; padding: 12px 16px; border-radius: 16px; background: var(--surface); white-space: pre-wrap; }
+    .msg.user { justify-self: end; background: var(--accent); color: var(--on-accent); }
+    .msg.system { justify-self: center; background: none; color: var(--muted); font-size: 0.875rem; }
+    .msg.app { justify-self: stretch; max-width: none; background: none; border: 1px dashed var(--faint); color: var(--muted); font-size: 0.8125rem; }
+    form, .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    input, select { min-height: 48px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--surface); font: inherit; }
+    input { flex: 1; }
+    #exercise { margin-top: 16px; padding: 16px 20px; border-radius: 16px; background: var(--surface); }
+    #exercise strong { font-size: 1.25rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1 class="page-title">Coach-test</h1>
+    <p class="lead">Text, ingen röst. Samma agent, prompt och modell som den riktiga coachen.</p>
+
+    <div class="row">
+      <select id="pass"></select>
+      <button class="btn" id="connect">Starta samtal</button>
+      <span id="status">Inte ansluten</span>
+    </div>
+
+    <!-- stands in for the app's screen: which exercise is "showing" -->
+    <div id="exercise" hidden>
+      <div class="row">
+        <button class="btn ghost" id="prev">◀</button>
+        <div style="flex:1"><small id="count"></small><br><strong id="name"></strong></div>
+        <button class="btn ghost" id="next">▶</button>
+      </div>
+    </div>
+
+    <label class="row" style="margin-top:12px"><input type="checkbox" id="showApp" style="flex:none;min-height:auto"> Visa vad appen skickar till coachen</label>
+
+    <div id="log"></div>
+    <form id="form" hidden>
+      <input id="text" placeholder="Skriv till coachen…" autocomplete="off">
+      <button class="btn">Skicka</button>
+    </form>
+  </main>
+
+  <script type="module">
+    // ElevenLabs' own library, loaded from a CDN (pinned version)
+    import { Conversation } from "./vendor/elevenlabs-client.js";
+    // what we tell the coach – shared with the real app later
+    import { passContext, exerciseContext } from "./coach-context.js";
+
+    const $ = (id) => document.getElementById(id);
+    let conversation = null;
+    let pass, list, i = 0;
+
+    // ---- the same content the app shows ----
+    const [index, lib] = await Promise.all([
+      fetch("content/index.json").then((r) => r.json()),
+      fetch("content/exercises.json").then((r) => r.json()),
+    ]);
+    index.passes.forEach((p) => $("pass").append(new Option(p.title, p.id)));
+
+    function show(text, who) {            // who: "user" | "agent" | "system" | "app"
+      if (who === "app" && !$("showApp").checked) return;
+      const div = document.createElement("div");
+      div.className = `msg ${who}`;
+      div.textContent = text.replace(/\[(?!Appen)[^\]]*\]\s*/g, ""); // hide voice tags like [warmly]
+      $("log").append(div);
+      div.scrollIntoView({ block: "end" });
+    }
+
+    function showExercise() {
+      $("count").textContent = `${pass.title} · ${i + 1} av ${list.length}`;
+      $("name").textContent = list[i].name;
+      $("prev").disabled = i === 0;
+      $("next").disabled = i === list.length - 1;
+    }
+
+    $("connect").addEventListener("click", async () => {
+      if (conversation) return conversation.endSession();   // already talking → hang up
+
+      pass = index.passes.find((p) => p.id === $("pass").value);
+      list = pass.exercises.map((id) => lib.exercises.find((e) => e.id === id));
+      i = 0;
+
+      $("status").textContent = "Hämtar biljett…";
+      // 1. ask OUR server for a ticket (the API key never leaves the server)
+      const res = await fetch("/api/token");
+      const data = await res.json();
+      if (!res.ok) { $("status").textContent = "Fel: " + data.error; return; }
+
+      // 2. connect to the agent with the ticket, in text mode
+      $("status").textContent = "Ansluter…";
+      conversation = await Conversation.startSession({
+        signedUrl: data.signedUrl,
+        textOnly: true,                                  // this page: no microphone, no audio
+        overrides: { conversation: { textOnly: true } }, // the agent: answer in text only
+
+        // The coach's "buttons". Names must match the tools in the dashboard exactly.
+        // Whatever we return goes back to the coach as the tool's result.
+        clientTools: {
+          next_exercise: () => {
+            show("🔧 coachen kör next_exercise", "system");
+            if (i === list.length - 1) return "Det här är redan passets sista övning.";
+            return asToolResult(changeExercise(i + 1));
+          },
+          previous_exercise: () => {
+            show("🔧 coachen kör previous_exercise", "system");
+            if (i === 0) return "Det här är redan passets första övning.";
+            return asToolResult(changeExercise(i - 1));
+          },
+        },
+
+        onConnect: () => {
+          $("status").textContent = "Ansluten";
+          $("connect").textContent = "Avsluta";
+          $("form").hidden = $("exercise").hidden = false;
+          showExercise();
+          $("text").focus();
+        },
+        onMessage: ({ message, role }) => role === "agent" && show(message, "agent"),
+        onError: (message) => show("Fel: " + message, "system"),
+        onDisconnect: (details) => {
+          conversation = null;
+          console.log("[coach] disconnected:", details);
+          $("status").textContent = "Samtalet är avslutat" + (details?.reason && details.reason !== "user" ? ` (${details.reason}${details.message ? ": " + details.message : ""})` : "");
+          $("connect").textContent = "Starta samtal";
+          $("form").hidden = $("exercise").hidden = true;
+        },
+      });
+
+      // 3. tell the coach where we are – silently, it shouldn't answer these.
+      // (Here, not in onConnect: onConnect runs *inside* startSession, before
+      // `conversation` has been assigned.)
+      for (const note of [passContext(pass, list), exerciseContext(pass, list, i)]) {
+        conversation.sendContextualUpdate(note);
+        show(note, "app");
+      }
+    });
+
+    // 4. Change exercise – the ONE place that does it, whoever asked.
+    //    Returns the note describing the new exercise.
+    function changeExercise(k) {
+      i = k;
+      showExercise();
+      const note = exerciseContext(pass, list, i);
+      show(note, "app");
+      return note;
+    }
+
+    // A tool's answer shouldn't look like a message the coach could write itself
+    // (the model started imitating "[Appen] …" notes – and inventing their content).
+    const asToolResult = (note) => "Klart, appen visar nu den nya övningen.\n" + note.replace(/^\[Appen\] /, "");
+
+    // The student tapped ◀ ▶ (like tapping Färdig in the app): the coach didn't
+    // ask for this, so tell it as a message – and it answers by introducing the exercise.
+    $("prev").addEventListener("click", () => conversation.sendUserMessage(changeExercise(i - 1)));
+    $("next").addEventListener("click", () => conversation.sendUserMessage(changeExercise(i + 1)));
+    // (When the COACH switches via a tool, the note goes back as the tool's result instead.)
+
+    // 5. send what you type
+    $("form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = $("text").value.trim();
+      if (!text || !conversation) return;
+      show(text, "user");                 // text mode doesn't echo our own messages back
+      conversation.sendUserMessage(text);
+      $("text").value = "";
+    });
+  </script>
+</body>
+</html>

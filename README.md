@@ -52,18 +52,11 @@ When you change `app.js`, `style.css` or `index.html`, bump `VERSION` in `app/sw
 
 ## Guided sessions (voice)
 
-"Starta pass" on a pass page opens `#/kor/<pass>`: one exercise at a time, read aloud by the device's Swedish voice. Commands (or the on-screen buttons):
-
-| Say | Does |
-|---|---|
-| färdig / klar / nästa | next exercise |
-| tillbaka / föregående | previous exercise |
-| igen / upprepa | read the exercise again |
-| paus / stopp · fortsätt | pause / resume the voice |
-| avsluta | end the session |
+"Starta pass" on a pass page opens `#/kor/<pass>`: one exercise at a time, guided by a recorded coach voice (ElevenLabs clips, with the device's own voice as fallback). The student moves on with the on-screen buttons: Färdig, back, listen again, pause.
 
 - `app/speech.js` – every sentence the session says (shared by the app and the recorder).
-- `app/voice.js` – speaker and command listener. The speaker plays recorded clips from `app/audio/` and falls back to the device's own voice. Command words live in `COMMANDS`.
+- **Coach scripts:** an exercise with a `coach` block in `exercises.json` is taught like a sensei – `intro`, `guide` (each line can light up a step card with `"step": n`) and `cues` (encouragement while you work, first after 20 s, then every 25 s). Session framing (welcome, transitions, how "färdig" works, finish) lives under `coach` in `index.json` and per pass. Exercises without a script fall back to reading their steps.
+- `app/voice.js` – the speaker: plays recorded clips from `app/audio/` and falls back to the device's own voice.
 - **Recording the voice with ElevenLabs:** copy `.env.example` to `.env`, add your API key and voice id, then
   ```sh
   node tools/generate-voice.mjs --voices    # list voices
@@ -71,8 +64,7 @@ When you change `app.js`, `style.css` or `index.html`, bump `VERSION` in `app/sw
   node tools/generate-voice.mjs             # record, then bump VERSION in app/sw.js
   ```
   Re-run after changing any exercise text – only changed sentences are re-recorded.
-- The app ignores command words it is saying itself (e.g. a step that starts with "Upprepa…").
-- Speech recognition: Chrome (needs internet) and Safari. Elsewhere the buttons still work. The screen is kept awake during a session.
+- The screen is kept awake during a session.
 
 ## Design
 

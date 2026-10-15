@@ -1,8 +1,8 @@
-// Voice: a calm Swedish speaker and a command listener (SpeechRecognition).
-// The speaker plays pre-recorded ElevenLabs clips (audio/index.json, made by
-// tools/generate-voice.mjs) and falls back to the device's own voice
-// (speechSynthesis) for any line without a clip. Everything is optional –
-// the session works with buttons alone.
+// The recorded coach's voice. Plays pre-recorded ElevenLabs clips
+// (audio/index.json, made by tools/generate-voice.mjs) and falls back to the
+// device's own voice (speechSynthesis) for any line without a clip.
+// This is the offline fallback; the live coach (ElevenLabs agent) talks and
+// listens by itself.
 
 const LANG = "sv-SE";
 
@@ -20,10 +20,8 @@ export function createSpeaker({ rate = 0.92, sentenceGap = 450, defaultGap = 110
   let clips = {};         // text -> file, from audio/index.json
   let voice = null;
   let run = 0;            // increments on every say()/stop(); stale callbacks compare against it
-  let current = "";       // text being spoken right now (used to ignore our own echo)
+  let current = "";       // text being spoken right now
   let keep = null;        // keep a reference: Chrome drops onend for garbage-collected utterances
-  let recent = "";        // what we just said – recognition results arrive late, so ignore it a bit longer
-  let recentUntil = 0;
 
   fetch("audio/index.json")
     .then((r) => (r.ok ? r.json() : { clips: {} }))
@@ -66,8 +64,6 @@ export function createSpeaker({ rate = 0.92, sentenceGap = 450, defaultGap = 110
   function begin(text) { current = text; }
   function end(text) {
     if (current === text) current = "";
-    recent = text;
-    recentUntil = Date.now() + 2500;
   }
 
   async function playClip(text, file, id) {
@@ -123,8 +119,6 @@ export function createSpeaker({ rate = 0.92, sentenceGap = 450, defaultGap = 110
   return {
     supported: !!synth || typeof audio.play === "function",
     get speaking() { return !!current; },
-    // text the listener should not react to: what we're saying now, and what we said a moment ago
-    get echoText() { return current + " " + (Date.now() < recentUntil ? recent : ""); },
 
     // Browsers only allow sound that starts inside a user gesture; call this from a tap.
     unlock() {
@@ -160,116 +154,6 @@ export function createSpeaker({ rate = 0.92, sentenceGap = 450, defaultGap = 110
       current = "";
       audio.pause();
       if (synth && (synth.speaking || synth.pending)) synth.cancel();
-    },
-  };
-}
-
-// ---------- Listener ----------
-// Continuous recognition that maps what you say to a command.
-
-const COMMANDS = {
-  next: ["färdig", "klar", "nästa"],
-  prev: ["tillbaka", "föregående", "bakåt"],
-  repeat: ["igen", "upprepa"],
-  pause: ["paus", "pausa", "stopp", "vänta"],
-  resume: ["fortsätt", "spela"],
-  end: ["avsluta"],
-};
-
-const norm = (s) => s.toLowerCase().normalize("NFC");
-
-// Returns { command, word } for the first command word in the text, or null.
-// Words that appear in `ignoreText` (what the app is saying right now) are skipped.
-export function matchCommand(text, ignoreText = "") {
-  const t = norm(text);
-  const ignore = norm(ignoreText);
-  let best = null;
-  for (const [command, words] of Object.entries(COMMANDS)) {
-    for (const word of words) {
-      const re = new RegExp(`(?<!\\p{L})${word}(?!\\p{L})`, "u");
-      const m = re.exec(t);
-      if (!m || re.test(ignore)) continue;
-      if (!best || m.index < best.index) best = { command, word, index: m.index };
-    }
-  }
-  return best && { command: best.command, word: best.word };
-}
-
-export function createListener({ onCommand, onState, ignoreText = () => "" }) {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let rec = null;
-  let wanted = false;
-  let lastFire = 0;
-  let fastEnds = 0;
-  let startedAt = 0;
-  const handled = new Set(); // result indexes already acted on (interim + final)
-
-  let state = "off";
-  const set = (next, detail) => { state = next; onState?.(next, detail); };
-
-  function build() {
-    rec = new SR();
-    rec.lang = LANG;
-    rec.continuous = true;
-    rec.interimResults = true;
-    rec.maxAlternatives = 3;
-
-    rec.onstart = () => { startedAt = Date.now(); set("listening"); };
-    rec.onresult = (e) => {
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        const key = `${startedAt}:${i}`;
-        if (handled.has(key)) continue;
-        const res = e.results[i];
-        for (let a = 0; a < res.length; a++) {
-          const hit = matchCommand(res[a].transcript, ignoreText());
-          if (!hit) continue;
-          handled.add(key);
-          if (Date.now() - lastFire < 1200) break; // one command per breath
-          lastFire = Date.now();
-          onCommand(hit.command, hit.word);
-          break;
-        }
-      }
-    };
-    rec.onerror = (e) => {
-      if (e.error === "not-allowed" || e.error === "service-not-allowed") {
-        wanted = false;
-        set("denied");
-      } else if (e.error === "network") {
-        wanted = false;
-        set("offline");
-      }
-      // "no-speech" / "aborted" just end the session; onend restarts it
-    };
-    rec.onend = () => {
-      // keep "denied"/"offline" visible instead of overwriting them with "off"
-      if (!wanted) return state === "denied" || state === "offline" ? undefined : set("off");
-      // browsers stop recognition after silence – start again, but back off if it keeps dying
-      fastEnds = Date.now() - startedAt < 1500 ? fastEnds + 1 : 0;
-      if (fastEnds > 4) { wanted = false; return set("error"); }
-      setTimeout(() => wanted && safeStart(), 250 * (fastEnds + 1));
-    };
-  }
-
-  function safeStart() {
-    try { rec.start(); } catch { /* already started */ }
-  }
-
-  return {
-    supported: !!SR,
-    get on() { return wanted; },
-    start() {
-      if (!SR) return set("unsupported");
-      if (!rec) build();
-      wanted = true;
-      if (state === "offline") set("off");
-      fastEnds = 0;
-      safeStart();
-    },
-    stop() {
-      wanted = false;
-      try { rec?.abort(); } catch {}
-      set("off");
     },
   };
 }

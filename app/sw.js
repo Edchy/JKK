@@ -2,10 +2,27 @@
 // content and images. Afterwards serves from cache and refreshes in the
 // background, so new exercises show up on the next visit.
 // Bump VERSION when app.js / style.css / index.html change.
-const VERSION = "v25";
+const VERSION = "v54";
 const CACHE = `jkk-${VERSION}`;
-const SHELL = ["./", "index.html", "style.css", "app.js", "voice.js", "speech.js", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "icons/apple-touch-icon.png", "icons/favicon.ico", "icons/favicon-32.png", "img/jarna-shaolin-logo.webp", "img/og-image.png",
+const SHELL = ["./", "style.css", "app.js", "voice.js", "speech.js", "live-coach.js", "coach-context.js", "manifest.webmanifest", "icons/noun-tiger-icon-192.png", "icons/noun-tiger-icon-512.png", "icons/noun-tiger-icon-maskable-512.png", "icons/noun-tiger-apple-touch-icon.png", "icons/noun-tiger-favicon.ico", "icons/noun-tiger-favicon.svg", "img/jarna-round-logo.svg", "img/og-image.png",
   "fonts/fraunces-latin-full-normal.woff2", "fonts/dm-sans-latin-wght-normal.woff2"];
+
+// Cloudflare redirects /index.html → /. A response that went through a redirect
+// may not answer a page load (Safari: "Response served by service worker has
+// redirections"), so we only ever store and serve clean copies.
+async function clean(res) {
+  if (!res.redirected) return res;
+  return new Response(await res.blob(), { status: res.status, statusText: res.statusText, headers: res.headers });
+}
+async function addAll(cache, urls) {
+  await Promise.all(
+    urls.map(async (url) => {
+      const res = await fetch(url, { cache: "no-cache" });
+      if (!res.ok) throw new Error(`${url}: ${res.status}`);
+      await cache.put(url, await clean(res));
+    })
+  );
+}
 
 async function contentUrls() {
   const lib = await (await fetch("content/exercises.json", { cache: "no-store" })).json();
@@ -28,8 +45,8 @@ self.addEventListener("install", (e) => {
   e.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE);
-      await cache.addAll(SHELL);
-      await cache.addAll(await contentUrls());
+      await addAll(cache, SHELL);
+      await addAll(cache, await contentUrls());
       self.skipWaiting();
     })()
   );
@@ -47,18 +64,24 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== location.origin) return;
+  // never cache the API: a ticket (/api/token) is single-use and expires
+  if (url.pathname.startsWith("/api/")) return;
 
   e.respondWith(
     (async () => {
       const cache = await caches.open(CACHE);
-      const key = e.request.mode === "navigate" ? "index.html" : e.request;
+      // the app itself is one page (index.html, hash routes); other pages
+      // like coach-test.html are cached under their own address
+      const appShell = e.request.mode === "navigate" && (url.pathname.endsWith("/") || url.pathname.endsWith("/index.html"));
+      const key = appShell ? "./" : e.request;
       const cached = await cache.match(key, { ignoreSearch: true });
       const network = fetch(e.request)
-        .then((res) => {
+        .then(async (raw) => {
+          const res = await clean(raw);
           if (res.ok) cache.put(key, res.clone());
           // new exercises were published: cache their images too
           if (res.ok && url.pathname.endsWith("/content/exercises.json")) {
-            contentUrls().then((urls) => cache.addAll(urls)).catch(() => {});
+            contentUrls().then((urls) => addAll(cache, urls)).catch(() => {});
           }
           return res;
         })

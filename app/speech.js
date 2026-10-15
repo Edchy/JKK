@@ -26,15 +26,14 @@ const titleLine = (ex) => spoken([`${ex.name}.`, ex.dose && `${ex.dose}.`].filte
 // ---- session framing (index.json → "coach") ----
 export const welcome = (pass, coach) =>
   pass.coach?.welcome || [`Välkommen. Idag kör vi ${pass.title}. Vi tar det lugnt och lyssnar på kroppen.`];
-export const howTo = (coach, canListen) =>
-  canListen ? coach?.howToVoice || "Säg färdig när du är klar, så går vi vidare." : coach?.howToTap || "Tryck på färdig när du är klar, så går vi vidare.";
+export const howTo = (coach) => coach?.howTo || "Tryck på nästa när du är klar, så går vi vidare.";
 export const transition = (coach, i) => pick(coach?.transitions, i) || "Bra.";
 export const lastUp = (coach) => coach?.last || "Sista övningen nu.";
 export const finished = (pass, coach) => pass.coach?.finish || [`Bra jobbat. ${pass.title} är klart.`];
 
 // Lines when an exercise starts. step = instruction card to highlight (-1 = none);
 // gap = pause after the line, in ms.
-export function exerciseLines({ pass, coach, ex, i, n, first, canListen }) {
+export function exerciseLines({ pass, coach, ex, i, n, first }) {
   const lines = [];
   const say = (text, step = -1, gap = 700) => lines.push({ text: spoken(text), step, gap });
 
@@ -49,7 +48,7 @@ export function exerciseLines({ pass, coach, ex, i, n, first, canListen }) {
     say(titleLine(ex), -1, 900);
     stepsAsLines(ex).forEach((t, k) => say(t, k, 1100));
   }
-  if (first) say(howTo(coach, canListen), -1, 0);
+  if (first) say(howTo(coach), -1, 0);
   return lines;
 }
 
@@ -64,10 +63,7 @@ export function allLines({ passes, exercises, coach }) {
     const list = pass.exercises.map((id) => exercises.find((e) => e.id === id)).filter(Boolean);
     const n = list.length;
     list.forEach((ex, i) =>
-      exerciseLines({ pass, coach, ex, i, n, first: i === 0, canListen: true }).forEach((l) => add(l.text))
-    );
-    list.forEach((ex, i) =>
-      exerciseLines({ pass, coach, ex, i, n, first: i === 0, canListen: false }).forEach((l) => add(l.text))
+      exerciseLines({ pass, coach, ex, i, n, first: i === 0 }).forEach((l) => add(l.text))
     );
     list.forEach((ex) => cueLines(ex).forEach(add));
     finished(pass, coach).forEach(add);
