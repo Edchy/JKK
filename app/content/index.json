@@ -153,7 +153,7 @@
     "sections": [
       {
         "title": "Kort sagt",
-        "text": "Appen har inga konton, ingen spårning och inga kakor. Det enda appen sparar är dina val i inställningarna – och det ligger bara i din telefon."
+        "text": "Appen har inga konton, ingen spårning och inga kakor. Det enda appen sparar är dina val i inställningarna – och det ligger bara i din telefon. Appen ligger hos Cloudflare, som (som alla webbhotell) ser din IP-adress när appen laddas."
       },
       {
         "title": "Live-coachen",
@@ -170,7 +170,7 @@
       }
     ],
     "withdraw": "Ångra godkännandet för live-coachen",
-    "owner": "",
+    "owner": "Eddie",
     "link": "Integritet"
   },
   "install": {

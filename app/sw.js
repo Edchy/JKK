@@ -2,7 +2,7 @@
 // content and images. Afterwards serves from cache and refreshes in the
 // background, so new exercises show up on the next visit.
 // Bump VERSION when app.js / style.css / index.html change.
-const VERSION = "v54";
+const VERSION = "v55";
 const CACHE = `jkk-${VERSION}`;
 const SHELL = ["./", "style.css", "app.js", "voice.js", "speech.js", "live-coach.js", "coach-context.js", "manifest.webmanifest", "icons/noun-tiger-icon-192.png", "icons/noun-tiger-icon-512.png", "icons/noun-tiger-icon-maskable-512.png", "icons/noun-tiger-apple-touch-icon.png", "icons/noun-tiger-favicon.ico", "icons/noun-tiger-favicon.svg", "img/jarna-round-logo.svg", "img/og-image.png",
   "fonts/fraunces-latin-full-normal.woff2", "fonts/dm-sans-latin-wght-normal.woff2"];
