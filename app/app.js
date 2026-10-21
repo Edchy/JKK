@@ -651,7 +651,7 @@ const prefs = (() => {
 })();
 const savePrefs = () => { try { localStorage.setItem("jkk-voice", JSON.stringify(prefs)); } catch {} };
 // Live mode can be replaced for this session only (the saved choice stays):
-// "recorded" when the coach couldn't connect, "silent" when the student asked the coach to stop.
+// "recorded" when the coach couldn't connect, "silent" when the student closed the consent sheet.
 let sessionMode = null;
 const mode = () => (!VOICE ? "silent" : (prefs.mode === "live" && sessionMode) || prefs.mode);
 const currentMode = () => MODES.find((m) => m.id === mode());
@@ -722,7 +722,6 @@ const LIVE_TEXT = {
   fallback: "Live-coachen gick inte att nå – inspelad röst istället",
 };
 function liveStatus(state) {
-  liveExit?.(state);
   const el = view.querySelector(".run-live");
   if (!el) return;
   el.dataset.state = state;
@@ -736,10 +735,12 @@ function liveCaption(text) {
 }
 
 // The coach's buttons. Names match the tools in the ElevenLabs dashboard.
+// It can only switch exercises: ending the pass or turning the coach off takes
+// a tap (✕, Avsluta, the voice button), so a misheard word can't end anything.
 const liveTools = {
   next_exercise: () => {
     if (!run) return "Inget pass pågår.";
-    if (run.i === run.list.length - 1) return "Det här är redan passets sista övning.";
+    if (run.i === run.list.length - 1) return "Det här är redan passets sista övning. Eleven avslutar passet med knappen Avsluta.";
     goTo(run.i + 1);
     return asToolResult(exerciseContext(run.pass, run.list, run.i + 1));
   },
@@ -760,42 +761,7 @@ const liveTools = {
     goTo(k);
     return asToolResult(exerciseContext(run.pass, run.list, k));
   },
-  // The student wants to stop the whole pass: goodbye, then home.
-  end_workout: () => {
-    if (!run) return "Inget pass pågår.";
-    afterGoodbye(() => (location.hash = "#/"));
-    return "Klart. Säg hejdå med en kort mening, sedan avslutar appen passet.";
-  },
-  // The student keeps training, without the coach (this session only).
-  stop_coach: () => {
-    if (!run) return "Inget pass pågår.";
-    afterGoodbye(() => {
-      sessionMode = "silent";
-      stopLive();
-      renderStep();
-    });
-    return "Klart. Säg hejdå med en kort mening, sedan stänger appen av rösten och eleven fortsätter på egen hand.";
-  },
 };
-
-// The coach gets to finish its goodbye before we hang up: wait until it has
-// spoken and gone quiet again (at most 10 s – text-only test chats never "speak").
-let liveExit = null;
-function afterGoodbye(then) {
-  const coach = live;
-  let spoke = false;
-  const go = () => {
-    clearTimeout(timer);
-    liveExit = null;
-    if (live === coach) then();
-  };
-  const timer = setTimeout(go, 10000);
-  liveExit = (state) => {
-    if (state === "speaking") spoke = true;
-    else if (state === "ended") { clearTimeout(timer); liveExit = null; } // hung up some other way (✕, dropped)
-    else if (spoke) go();
-  };
-}
 
 async function startLive() {
   if (live || !run) return;

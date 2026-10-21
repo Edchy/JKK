@@ -128,11 +128,9 @@ Two **client tools** (they run in the browser, because only the phone can change
 | `next_exercise` | `goTo(i + 1)` | `asToolResult(exerciseContext(…, i + 1))`, or "Det här är redan passets sista övning." |
 | `previous_exercise` | `goTo(i - 1)` | same for `i - 1`, or "…första övning." |
 | `go_to_exercise` | `{number}` (1-based, checked) → `goTo(number - 1)` | `asToolResult(…)`, or "Det finns ingen övning N…" / "redan på övning N" |
-| `end_workout` | after the goodbye: go home (`#/`) | "Klart. Säg hejdå…" |
-| `stop_coach` | after the goodbye: `sessionMode = "silent"`, hang up, re-render; the pass continues without voice. The saved choice stays live. | "Klart. Säg hejdå…" |
 
-- **Goodbye first:** `afterGoodbye()` waits until the coach has spoken and gone quiet again (state speaking → listening), at most 10 s, before acting. Cancelled if the call ends some other way.
-- **`sessionMode`** replaces live mode for this session only: `"recorded"` after a failed connection, `"silent"` after `stop_coach`. Picking a mode in the sheet clears it (so the student can turn the coach back on).
+- **No ending by voice.** The coach can only switch exercises. Ending the pass (✕, or Avsluta on the last exercise) and turning the coach off (voice button → Tyst) take a tap. There used to be `end_workout` and `stop_coach` tools; in a real voice test (Oct 2026) the coach misheard the student and ended the pass, so both were removed. The prompt tells the coach to point to the buttons instead.
+- **`sessionMode`** replaces live mode for this session only: `"recorded"` after a failed connection, `"silent"` after closing the consent sheet. Picking a mode in the sheet clears it (so the student can turn the coach back on).
 
 - The AI only *asks*; our code decides. It can't move past the ends.
 - **Tool path vs button path:** when the coach switches, it already knows, so the tool result carries the new exercise and we do **not** also `say()` it. When the student taps a button, `command()` sets `liveAnnounce`; `renderStep()` then `say()`s the new exercise once.
@@ -164,14 +162,14 @@ Only the prompt is versioned (`agent/prompt.md`). The rest lives in the ElevenLa
 - **Voice:** "Brage – Nordic Storyteller"; TTS model **V4 Turbo** (fastest). Recordings use `nEJYXtiAMFuP7hh9yoi4` / `eleven_v4`; verify they're the same voice if the live coach and recordings sound different.
 - **LLM:** Claude Haiku 4.5, reasoning effort Low, temperature lower-middle, backup LLM Default, token limit −1. DeepSeek was tried first: it imitated `[Appen]` notes and invented content.
 - **Agent behavior:** default personality off
-- **Tools:** `next_exercise`, `previous_exercise`, `go_to_exercise` (one required integer parameter `number`), `end_workout`, `stop_coach`. Type Client, no parameters (except go_to_exercise), wait for response **on**, pre-tool speech **off** (otherwise the coach introduced the next exercise *before* the tool answered and guessed wrong instructions), execution Immediate, interruptions Allow, sound None, response timeout **3 s**. The built-in system tool **End conversation** is **off**: the coach may only end through `end_workout` (otherwise it hung up on its own and the app showed the "couldn't reach" fallback). Descriptions (Swedish) tell the model when to use them; the "orkar inte → offer easier variant first" rule is in both the description and the prompt.
+- **Tools:** `next_exercise`, `previous_exercise`, `go_to_exercise` (one required integer parameter `number`). Nothing that ends the pass or the call (see 4.4). Type Client, no parameters (except go_to_exercise), wait for response **on**, pre-tool speech **off** (otherwise the coach introduced the next exercise *before* the tool answered and guessed wrong instructions), execution Immediate, interruptions Allow, sound None, response timeout **3 s**. The built-in system tool **End conversation** is **off**: the coach can't hang up at all (otherwise it hung up on its own and the app showed the "couldn't reach" fallback). Descriptions (Swedish) tell the model when to use them; the "orkar inte → offer easier variant first" rule is in both the description and the prompt.
 - **Privacy:** Store Call Audio **off**, Conversations Retention Period **30** days (= `privacy.days`), Zero Retention Mode off (we need transcripts to improve the prompt).
 - **Security:** authentication **on**. Overrides: only **Text only** enabled (used by `?textonly` and `coach-test.html`). Allowlist not set yet: add the production domain when the app is online.
 - **Limits:** daily call limit 50 (raise for students), concurrency = subscription, bursting **off** (it bills double), call queuing **off** (meant for phone lines).
 
 ### 4.8 The prompt (`agent/prompt.md`)
 
-Sections: Roll · Så pratar du · Så guidar du en övning (whole guidance in one go, then sparse cues on the turn timeout) · När det är tyst · Skolans principer · Ansträngning och smärta (muscle burn is good; sharp/joint pain, dizziness = stop) · När eleven är klar · När eleven vill ge upp · När eleven vill avsluta passet i förtid (ask once, then `end_workout`) · När eleven vill träna utan dig · Meddelanden från appen · Verktyg · Start, paus och slut.
+Sections: Roll · Så pratar du · Så guidar du en övning (whole guidance in one go, then sparse cues on the turn timeout) · När det är tyst · Skolans principer · Ansträngning och smärta (muscle burn is good; sharp/joint pain, dizziness = stop) · När eleven är klar · När eleven vill ge upp · När eleven vill avsluta passet i förtid (ask once, then point to ✕) · När eleven vill träna utan dig (point to the voice button) · Meddelanden från appen · Verktyg · Start, paus och slut.
 
 Rules that exist because of observed failures:
 - "Normalt högst två–tre meningar" + concrete examples for introducing an exercise: without examples, intros were 5–6 sentences.
