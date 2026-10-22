@@ -472,6 +472,55 @@
       "text": [
         "Följ genomgången i videon. Behåll en upprätt rygg genom hela rörelsen och låt knäna följa tårnas riktning. Stå högre om du behöver."
       ]
+    },
+    {
+      "id": "kickups-stretches",
+      "name": "Kickups & Stretches",
+      "subtitle": "Uppvärmning för bål och rörlighet",
+      "animals": [
+        "apa",
+        "bjorn"
+      ],
+      "tags": [
+        "bal",
+        "stretch"
+      ],
+      "images": 0,
+      "video": "4ldXz_c49xk",
+      "text": [
+        "Följ genomgången i videon. Rör dig mjukt och kontrollerat, och anpassa rörelsen efter din nivå."
+      ]
+    },
+    {
+      "id": "cobra-pushups",
+      "name": "Cobra Pushups",
+      "subtitle": "Armhävningar med kobran",
+      "animals": [
+        "bjorn"
+      ],
+      "tags": [],
+      "images": 0,
+      "video": "6ywYkrYwAes",
+      "text": [
+        "Följ genomgången i videon. Rör dig mjukt och kontrollerat, och anpassa rörelsen efter din nivå."
+      ]
+    },
+    {
+      "id": "tekken-combo",
+      "name": "Tekken Combo",
+      "subtitle": "Kombination av slag och sparkar",
+      "animals": [
+        "tiger"
+      ],
+      "tags": [
+        "slag",
+        "sparkar"
+      ],
+      "images": 1,
+      "video": "GaVzLQ05Uqw",
+      "text": [
+        "Följ genomgången i videon. Rör dig mjukt och kontrollerat, och anpassa rörelsen efter din nivå."
+      ]
     }
   ]
 }

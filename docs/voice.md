@@ -24,7 +24,7 @@ The student picks a mode on the pass page (or mid-session via the mode button). 
 |---|---|---|
 | `silent` – **Tyst** | Images and text only. | – |
 | `recorded` – **Inspelad röst** | A pre-recorded coach (ElevenLabs clips) explains each exercise and encourages now and then. Student taps **Nästa**. | Nothing – works offline |
-| `live` – **Live-coach** (default) | A live voice conversation with an ElevenLabs agent. The student can talk ("nu har jag gjort 30", "jag orkar inte", "kör nästa"); the coach answers and can switch exercises itself. | Internet, microphone, our token server |
+| `live` – **Live-coach** (testers only) | A live voice conversation with an ElevenLabs agent. The student can talk ("nu har jag gjort 30", "jag orkar inte", "kör nästa"); the coach answers and can switch exercises itself. | Internet, microphone, our token server |
 
 If live can't connect (offline, token error, dropped connection), the session **falls back to `recorded`** for the rest of that session. The saved choice stays `live`.
 
@@ -46,7 +46,8 @@ Starta pass ─► mode? ────┤ live-coach.js ⇄ ElevenLabs   │─�
 | `app/live-coach.js` | Everything about the live connection: ticket, SDK, pause/hang-up, limits. Exposes `createLiveCoach()`. |
 | `app/coach-context.js` | The `[Appen]` messages the app sends the live coach, built from `content/*.json`. Also `asToolResult()`. |
 | `app/speech.js` | Every sentence the **recorded** coach says. Shared by the app and the recorder. |
-| `app/voice.js` | The **recorded** speaker: plays clips from `app/audio/`, falls back to device TTS. |
+| `app/voice.js` | The **recorded** speaker: plays clips from `app/audio/`; lines without a clip are silent. |
+| `app/music.js` | Background music (`passes[].music`), separate from the voice: plays in silent/recorded, stopped in live. See §5. |
 | `app/audio/` | Recorded clips (`<hash>.mp3`) + `index.json` manifest (text → file). |
 | `agent/prompt.md` | **Source of truth** for the live agent's system prompt. The dashboard is updated by copying this whole file. |
 | `server.mjs` | Local dev server: serves `app/` and `GET /api/token`. |
@@ -56,7 +57,7 @@ Starta pass ─► mode? ────┤ live-coach.js ⇄ ElevenLabs   │─�
 ## 3. Mode selection and switching
 
 - `MODES` in `app.js` lists the three modes (id, label, subtitle, icon). `modePicker()` renders them; the same markup is used on the pass page and in the in-session sheet (`SHEETS.mode`).
-- `prefs.mode` is stored in `localStorage["jkk-voice"]` as `{ "mode": "silent" | "recorded" | "live" }`. Old `{ "sound": false }` migrates to `silent`. New users default to `live`.
+- `prefs.mode` is stored in `localStorage["jkk-voice"]` as `{ "mode": "silent" | "recorded" | "live" }`. Old `{ "sound": false }` migrates to `silent`. New users default to `silent`; the choice is shown right under Starta pass so the voice is easy to find.
 - `mode()` is the **effective** mode: `live` becomes `recorded` when `liveFailed` is set for this session.
 - One document-level click handler catches every `[data-mode]` card, saves the choice and, mid-session, calls `applyMode()`, which stops whatever is playing and starts the new mode (`startLive()` / `stopLive()` / `speak()`).
 
@@ -77,7 +78,7 @@ live-coach.js ── GET /api/token ──►  holds ELEVENLABS_SERVER_KEY ─�
 - **The API key never reaches the phone.** `server.mjs` asks ElevenLabs for a **signed URL**, a one-time ticket valid 15 minutes to *start* a conversation, and returns only that. The agent has authentication on, so it refuses conversations without one.
 - **The SDK** (`@elevenlabs/client`, pinned `1.27.0`) is **self-hosted** in `app/vendor/` (built by `tools/vendor-sdk.sh`: one esbuild bundle incl. livekit, ~600 kB) and loaded with a dynamic `import()` **only when a live session starts**, so the app itself stays small. Self-hosted so no CDN sees the student's IP (GDPR). The SDK also wants an audio resampler worklet from jsDelivr on some browsers (mainly Firefox): we pass `libsampleratePath` pointing at `app/vendor/libsamplerate.worklet.js` (2 MB, only fetched when needed). Not in the service worker's SHELL (live needs internet anyway); cached at runtime once fetched.
 - **Pause:** muting isn't enough – the conversation keeps running and the turn timeout gives the coach turns it speaks into the muted speaker. `pause()` sends `pauseNote` and then `sendUserActivity()` every 1.5 s (each holds the agent ~2 s); `resume()` sends `unpauseNote` so it picks up. After 2 min it still hangs up.
-- **Test mode:** all voice (Inspelad röst and Live-coach) is only on for a phone with the test code (`TESTER` / `VOICE` in `app.js`: `?tester=<code>` or Inställningar → Testkod), or on localhost. Everyone else: `mode()` is always `"silent"`; the voice choice, ⟲ and pause are hidden. Online, `worker.js` refuses live tickets without a matching `X-Tester` header (`TESTER_KEY` secret); `live-coach.js` sends it.
+- **Test mode:** only the Live-coach is limited to a phone with the test code (`TESTER` / `LIVE` in `app.js`: `?tester=<code>` or Inställningar → Testkod), or localhost. Everyone else gets Tyst and Inspelad röst (`modes()` leaves out live); a saved `live` choice without the code counts as `"silent"`. ⟲ and pause are hidden while the mode is Tyst. Online, `worker.js` refuses live tickets without a matching `X-Tester` header (`TESTER_KEY` secret); `live-coach.js` sends it.
 - **Consent (GDPR):** before the first live session on a phone, `startLive()` shows the `consent` sheet (texts in `index.json` → `privacy.live`). `prefs.liveOk` remembers the answer in localStorage. "Inte nu" / closing → `sessionMode = "recorded"` for this session. Withdraw under Inställningar (cog on Hem, `#/installningar`); the privacy page is `#/installningar/integritet` (`privacy.sections`). `privacy.days` must match the agent's *Conversations Retention Period*.
 
 ### 4.2 `createLiveCoach()` API (`app/live-coach.js`)
@@ -164,7 +165,8 @@ Only the prompt is versioned (`agent/prompt.md`). The rest lives in the ElevenLa
 - **Agent behavior:** default personality off
 - **Tools:** `next_exercise`, `previous_exercise`, `go_to_exercise` (one required integer parameter `number`). Nothing that ends the pass or the call (see 4.4). Type Client, no parameters (except go_to_exercise), wait for response **on**, pre-tool speech **off** (otherwise the coach introduced the next exercise *before* the tool answered and guessed wrong instructions), execution Immediate, interruptions Allow, sound None, response timeout **3 s**. The built-in system tool **End conversation** is **off**: the coach can't hang up at all (otherwise it hung up on its own and the app showed the "couldn't reach" fallback). Descriptions (Swedish) tell the model when to use them; the "orkar inte → offer easier variant first" rule is in both the description and the prompt.
 - **Privacy:** Store Call Audio **off**, Conversations Retention Period **30** days (= `privacy.days`), Zero Retention Mode off (we need transcripts to improve the prompt).
-- **Security:** authentication **on**. Overrides: only **Text only** enabled (used by `?textonly` and `coach-test.html`). Allowlist not set yet: add the production domain when the app is online.
+- **Security:** authentication **on**. Overrides: only **Text only** enabled (used by `?textonly` and `coach-test.html`). **No allowlist, on purpose:** ElevenLabs says not to combine an allowlist with signed URLs on the same agent (pick one; signed URLs are their recommendation for client apps). Our lock is the signed URL (valid 15 min) from `/api/token`.
+- **Guardrails (Oct 2026):** Focus **on**, Manipulation **on** (ends the conversation on prompt-injection attempts). Content **on** with Sexual, Harassment, Self Harm, Profanity, Politics and religion; **Violence and Medical and Legal Information off**: a kung fu coach talks punches and kicks, and must be able to say "om det gör ont, sluta". A content trigger ends the call (retry needs blocking mode, +0.2–0.5 s per reply), so false positives would drop students mid-pass. All three are free.
 - **Limits:** daily call limit 50 (raise for students), concurrency = subscription, bursting **off** (it bills double), call queuing **off** (meant for phone lines).
 
 ### 4.8 The prompt (`agent/prompt.md`)
@@ -194,9 +196,10 @@ Workflow: edit `agent/prompt.md` → copy the **whole file** into the dashboard 
 
 - **What it says:** `speech.js` builds lines per exercise: a welcome (first exercise) or a transition, then the exercise's `coach` script from `exercises.json` (`intro`, `guide` with `step` = which instruction card to highlight, `cues`), or the plain steps when there's no script, then once "Kör i din egen takt… trycker du på nästa". `cueLines` are spoken while the student works (`CUE_FIRST` = 20 s, then every `CUE_EVERY` = 25 s).
 - **Session framing** text (`howTo`, `transitions`, `last`) is in `index.json → coach`; welcome/finish per pass in `passes[].coach`.
-- **Playback** (`voice.js`): `createSpeaker()` plays the clip listed for the exact text in `app/audio/index.json`, or falls back to device TTS (`speechSynthesis`, best Swedish voice). Clips are fetched as blobs and preloaded per exercise.
+- **Playback** (`voice.js`): `createSpeaker()` plays the clip listed for the exact text in `app/audio/index.json`. A line without a clip (or whose clip won't load) is skipped: no sound, no pause, no step highlight. There is deliberately no device-TTS fallback (`speechSynthesis` was unreliable in Chrome and the owner prefers silence); it was removed in Oct 2026. Clips are fetched as blobs and preloaded per exercise.
 - **Recording** (`tools/generate-voice.mjs`, uses `ELEVENLABS_API_KEY`): `--dry-run` shows what's missing and the character count, `--sample` records only the first exercise of the first pass, and no flag records everything missing. Clips are named by a hash of voice + model + settings + text, so only changed lines are re-recorded, and unused clips are deleted. Defaults: voice `nEJYXtiAMFuP7hh9yoi4`, model `eleven_v4`, speed 0.9. **Always test with `--sample` before a full run**: it costs money.
-- **State:** only Pass 1 / Wide stance has a coach script and clips. The other 14 exercises have no script and are effectively silent (the device-TTS fallback doesn't work reliably in Chrome; the owner doesn't want it anyway).
+- **Background music** (`music.js`): a second `<audio>` element under the coach, started `passes[].music.delay` s after Starta pass by `syncMusic()` in `app.js` (called from `renderStep`, `applyMode` and the Musik switch). Pause/resume follow the pass's pause button; `finish()` fades it out over 3 s, leaving the session stops it. Never in live mode: the agent's microphone would pick it up. The quiet level (−24 dB) is baked into the file because iOS ignores `audio.volume`, so the fade-out only works on desktop/Android; on iPhone it just stops. `music.unlock()` plays silence inside the Starta tap so the delayed start is allowed. Not yet checked on an iPhone with voice clips and music playing together; ducking the music under the voice is a possible next step.
+- **State (Oct 2026):** Pass 1 exercises 1–6 are recorded (Wide stance with a coach script, the rest reading their steps). Mabu med sidoslag, Kung Fu Pushups and all of Pass 2 are not recorded yet, so the recorded coach is silent there. `node tools/generate-voice.mjs --dry-run` lists what's missing; `--only <exercise-id>` records one exercise at a time.
 
 ## 6. Keys, server and deployment
 
@@ -211,7 +214,7 @@ Workflow: edit `agent/prompt.md` → copy the **whole file** into the dashboard 
 
 `server.mjs` (port 4174) serves `app/` with a path-traversal guard (`/../.env` → 404) and `GET /api/token` with `Cache-Control: no-store`.
 
-**Production:** not deployed yet. The host needs the same `/api/token` endpoint (e.g. a Vercel function with the same ~15 lines), `ELEVENLABS_SERVER_KEY` and `ELEVENLABS_AGENT_ID` as host secrets, and the agent's allowlist set to the production domain.
+**Production:** Cloudflare Workers, https://kungfu-fitness.thinksmall.workers.dev, published with `npx wrangler@4 deploy`. `worker.js` is the online twin of `server.mjs`: Cloudflare serves `app/` (minus `app/.assetsignore`) directly, and the worker answers `GET /api/token`, only same-origin, at most 5 tickets per minute per IP (`TOKEN_LIMITER` in `wrangler.jsonc`), and only with an `X-Tester` header matching `TESTER_KEY`. Secrets (`npx wrangler@4 secret put …`): `ELEVENLABS_SERVER_KEY`, `ELEVENLABS_AGENT_ID`, `TESTER_KEY`. Logs: `npx wrangler@4 tail`.
 
 **Service worker** (`app/sw.js`): `/api/*` is never cached, since a cached ticket would be expired. Navigations only map to `index.html` for the app shell (`/`, `/index.html`); other pages like `coach-test.html` are cached under their own URL. The live SDK (cross-origin) is not cached. Bump `VERSION` after changing any app file.
 
@@ -236,7 +239,7 @@ Workflow: edit `agent/prompt.md` → copy the **whole file** into the dashboard 
 - **Agent only:** `http://localhost:4174/coach-test.html` has a pass picker, ◀ ▶ buttons, tool calls shown as "🔧" lines, and "Visa vad appen skickar" to show the `[Appen]` notes.
 - **Fallback:** make `/api/token` fail (stop `server.mjs`, or open the app via another server); the session should switch to recorded.
 - **Automated browser tests:** long conversations exceed a single tool call's time limit. Start the script without awaiting and poll a `window.__done` flag. Background tabs throttle timers and don't load media. Always unregister the service worker and clear caches first, or you test stale code.
-- **Student view:** open `http://[::1]:4174` (not `localhost`, where voice is always on) to see the app without voice.
+- **Student view:** open `http://[::1]:4174` (not `localhost`, where the live coach is always on) to see the student version.
 - **Online as the owner:** `https://kungfu-fitness.thinksmall.workers.dev/?tester=<code>`, or Inställningar → Testkod in the installed app.
 - **Costs:** every live test uses credits (≈ 500 per conversation, see Billing). Hang up (✕ / Avsluta) when done.
 
@@ -257,7 +260,8 @@ Not yet verified:
 - the 2-min pause hang-up + reconnect, and the 30-min limit
 - iPhone/Android, especially the installed PWA (mic quirks)
 - production deployment of `/api/token`
+- guardrails don't end normal coaching: in `coach-test.html` (text, cheap) ask e.g. "hur gör jag ett sidoslag?" and "det gör ont i knät"; the conversation should continue. If a guardrail fires, the conversation's analytics in ElevenLabs say which one
 
 Content to-dos (instructor): coach scripts for the other 14 exercises (recorded mode), "Enklare" variants for most exercises (only Bear Walk and Kung Fu Pushups have one), review of glossary and prompt wording.
 
-Before students use it: a hard spending cap (support ticket and/or a server-side budget, see Billing), decide on data retention in ElevenLabs (transcripts and audio are stored by default; students may be minors, so GDPR consent applies), raise the daily call limit, and set the allowlist.
+Before students use it: a hard spending cap (support ticket and/or a server-side budget, see Billing), decide on data retention in ElevenLabs (transcripts and audio are stored by default; students may be minors, so GDPR consent applies), and raise the daily call limit.

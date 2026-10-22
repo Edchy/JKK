@@ -6,17 +6,22 @@
   <title>Kung Fu Fitness</title>
   <meta name="description" content="Hemmaträning från Järna Kung Fu & Kultur">
   <meta name="theme-color" content="#f3efe6">
+  <!-- the saved theme (Inställningar → Utseende) before the first paint, so it never flashes Papper -->
+  <script>try { const t = localStorage.getItem("jkk-theme"); if (["siden", "lotus", "wudang"].includes(t)) document.documentElement.dataset.theme = t; } catch {}</script>
   <meta property="og:title" content="Kung Fu Fitness – Järna Kung Fu & Kultur">
   <meta property="og:description" content="Hemmaträning från Järna Kung Fu & Kultur">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="img/og-image.png">
+  <!-- full address: link previews (iMessage, Facebook, Slack) fetch the image on their own and ignore relative paths -->
+  <meta property="og:image" content="https://kungfu-fitness.thinksmall.workers.dev/img/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Järna Kung Fu & Kultur – svart tiger och text på gul bakgrund">
+  <meta property="og:image:alt" content="Kung Fu Fitness – rund logga med tigerhuvud från Järna Kung Fu & Kultur">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icons/noun-tiger-favicon.ico" sizes="16x16 32x32 48x48">
-  <link rel="icon" href="icons/noun-tiger-favicon.svg" type="image/svg+xml" sizes="any">
+  <!-- the ICO must not claim 16x16, or Chrome prefers it over the SVG, which
+       is the only one that switches to light in dark mode -->
+  <link rel="icon" href="icons/noun-tiger-favicon.ico" sizes="32x32">
+  <link rel="icon" href="icons/noun-tiger-favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/noun-tiger-apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Kung Fu">
@@ -29,10 +34,10 @@
 <body>
   <main id="view" tabindex="-1"></main>
   <nav class="tabbar" aria-label="Huvudmeny">
-    <a class="tab" data-tab="hem" href="#/"><span class="i i-house" aria-hidden="true"></span>Hem</a>
-    <a class="tab" data-tab="pass" href="#/pass"><span class="i i-list" aria-hidden="true"></span>Pass</a>
-    <a class="tab" data-tab="ovningar" href="#/ovningar"><span class="i i-taichi" aria-hidden="true"></span>Övningar</a>
-    <a class="tab" data-tab="ordbok" href="#/ordbok"><span class="i i-book-open" aria-hidden="true"></span>Ordbok</a>
+    <a class="tab" data-tab="hem" href="#/"><span class="i i-nav-hem" aria-hidden="true"></span>Hem</a>
+    <a class="tab" data-tab="pass" href="#/pass"><span class="i i-nav-pass" aria-hidden="true"></span>Pass</a>
+    <a class="tab" data-tab="ovningar" href="#/ovningar"><span class="i i-nav-ovningar" aria-hidden="true"></span>Övningar</a>
+    <a class="tab" data-tab="ordbok" href="#/ordbok"><span class="i i-nav-ordbok" aria-hidden="true"></span>Ordbok</a>
   </nav>
 </body>
 </html>

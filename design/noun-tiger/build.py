@@ -24,15 +24,18 @@ font=TTFont(ROOT/'app/fonts/dm-sans-latin-wght-normal.woff2')
 if 'fvar' in font:font=instantiateVariableFont(font,{'wght':700},inplace=False)
 glyphs=font.getGlyphSet();cmap=font.getBestCmap();upem=font['head'].unitsPerEm
 
-def curved(text,radius,bottom=False):
+# at: where the word is centred, degrees clockwise from 3 o'clock (-90 = top).
+# Outward words read clockwise with letter tops pointing out; inward words
+# (the bottom one) read the other way with tops pointing in, so they stay upright.
+def curved(text,radius,at=-90,inward=False):
  size=51; tracking=7; scale=size/upem
  widths=[glyphs[cmap[ord(c)]].width*scale for c in text]
  total=sum(widths)+tracking*(len(text)-1);cursor=-total/2;parts=[]
  for c,width in zip(text,widths):
   offset=(cursor+width/2)/radius
-  theta=math.pi/2-offset if bottom else -math.pi/2+offset
+  theta=math.radians(at)+(-offset if inward else offset)
   x=400+radius*math.cos(theta);y=400+radius*math.sin(theta)
-  rotation=math.degrees(theta)+(-90 if bottom else 90)
+  rotation=math.degrees(theta)+(-90 if inward else 90)
   pen=SVGPathPen(glyphs);glyphs[cmap[ord(c)]].draw(pen)
   if pen.getCommands():
    parts.append(f'<path transform="translate({x:.5f} {y:.5f}) rotate({rotation:.5f}) scale({scale:.7f} {-scale:.7f}) translate({-glyphs[cmap[ord(c)]].width/2:.3f} 0)" d="{pen.getCommands()}"/>')
@@ -43,28 +46,61 @@ def svg(body,view='0 0 800 800',label='Järna Kung Fu & Kultur'):
  label=escape(label,quote=True)
  return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{view}" role="img" aria-label="{label}"><title>{label}</title>{body}</svg>'
 
-logo=svg(f'<g fill="{INK}"><circle cx="400" cy="400" r="377" fill="none" stroke="{INK}" stroke-width="3"/>{curved("JÄRNA KUNG FU",303)}{curved("& KULTUR",341,True)}<circle cx="73" cy="400" r="5"/><circle cx="727" cy="400" r="5"/><g transform="translate(144 137)">{paths}</g></g>')
+# KUNG FU on top, JÄRNA and HÖLÖ down the sides, KULTUR below; a dot on each diagonal between them.
+dots=''.join(f'<circle cx="{400+327*math.cos(math.radians(a)):.3f}" cy="{400+327*math.sin(math.radians(a)):.3f}" r="5"/>' for a in (45,135,225,315))
+ring=f'<g fill="{INK}"><circle cx="400" cy="400" r="377" fill="none" stroke="{INK}" stroke-width="3"/>{curved("KUNG FU",303)}{curved("JÄRNA",303,180)}{curved("HÖLÖ",303,0)}{curved("KULTUR",341,90,True)}{dots}<g transform="translate(144 137)">{paths}</g></g>'
+logo=svg(ring)
 (HERE/'logo.svg').write_text(logo)
+
+# Straight text as outlines, for the social card. Same fonts and settings as
+# the app's headings (Fraunces 600, soft, -0.02em) and body (DM Sans 400).
+# No kerning: fine at these sizes, checked by eye.
+def face(name,axes):
+ f=instantiateVariableFont(TTFont(ROOT/'app/fonts'/name),axes,inplace=False)
+ return f.getGlyphSet(),f.getBestCmap(),f['head'].unitsPerEm
+def line(text,fnt,size,x,y,fill,tracking=0):
+ gs,cm,em=fnt;scale=size/em;parts=[]
+ for c in text:
+  g=gs[cm[ord(c)]];pen=SVGPathPen(gs);g.draw(pen)
+  if pen.getCommands():parts.append(f'<path transform="translate({x:.2f} {y:.2f}) scale({scale:.6f} {-scale:.6f})" d="{pen.getCommands()}"/>')
+  x+=g.width*scale+tracking*size
+ return f'<g fill="{fill}">{"".join(parts)}</g>'
+TITLE=face('fraunces-latin-full-normal.woff2',{'wght':600,'SOFT':100,'WONK':0,'opsz':104})
+BODY=face('dm-sans-latin-wght-normal.woff2',{'wght':400})
+MUTED='#5c5850'
+# og:image, 1200×630: the round logo on the app's paper, the app's name beside it.
+og=svg(f'<rect width="1200" height="630" fill="{PAPER}"/><g transform="translate(155 85) scale(.575)">{ring}</g>'
+ f'{line("Kung Fu",TITLE,104,685,230,INK,-.02)}{line("Fitness",TITLE,104,685,340,INK,-.02)}'
+ f'{line("Hemmaträning från",BODY,34,687,420,MUTED)}{line("Järna Kung Fu & Kultur",BODY,34,687,466,MUTED)}',
+ view='0 0 1200 630',label='Kung Fu Fitness – Järna Kung Fu & Kultur')
 mark=svg(f'<g fill="{INK}">{paths}</g>',view='36 16 440 480',label='Tiger')
 (HERE/'tiger.svg').write_text(mark)
 # Original head, generous safe padding; no name around the small icons.
 icon=svg(f'<rect width="512" height="512" fill="{PAPER}"/><g fill="{INK}" transform="translate(15 5) scale(.94)">{paths}</g>',view='0 0 512 512',label='Tiger')
 maskable=svg(f'<rect width="512" height="512" fill="{PAPER}"/><g fill="{INK}" transform="translate(64 64) scale(.75)">{paths}</g>',view='0 0 512 512',label='Tiger')
-(HERE/'favicon.svg').write_text(icon)
+# Favicon: just the head on transparent, cropped square. Ink on a dark tab bar
+# would vanish, so the SVG turns paper-coloured in dark mode. The ICO (for
+# browsers without SVG favicons) can't switch and stays ink.
+FAV='16 16 480 480'
+favicon=svg(f'<style>path{{fill:{INK}}}@media (prefers-color-scheme:dark){{path{{fill:{PAPER}}}}}</style>{paths}',view=FAV,label='Tiger')
+favicon_ink=svg(f'<g fill="{INK}">{paths}</g>',view=FAV,label='Tiger')
+(HERE/'favicon.svg').write_text(favicon)
 (HERE/'app-icon.svg').write_text(icon)
 
-def png(s,size,dest):
- cairosvg.svg2png(bytestring=s.encode(),output_width=size,output_height=size,write_to=str(dest))
+def png(s,size,dest,height=None):
+ cairosvg.svg2png(bytestring=s.encode(),output_width=size,output_height=height or size,write_to=str(dest))
 
 png(logo,800,HERE/'logo.png')
-for size in (16,32,48):png(icon,size,HERE/f'favicon-{size}.png')
+png(og,1200,HERE/'og-image.png',630)
+for size in (16,32,48):png(favicon_ink,size,HERE/f'favicon-{size}.png')
 # Compose ICO from separately rendered sizes rather than downsampling one master.
 frames=[Image.open(HERE/f'favicon-{n}.png').convert('RGBA') for n in (16,32,48)]
 frames[-1].save(HERE/'favicon.ico',sizes=[(16,16),(32,32),(48,48)],append_images=frames[:-1])
 for name,size in [('apple-touch-icon.png',180),('icon-192.png',192),('icon-512.png',512)]:png(icon,size,HERE/name)
 png(maskable,512,HERE/'icon-maskable-512.png')
-for name in ['logo.svg','tiger.svg']:
- shutil.copy2(HERE/name,ROOT/'app/img'/('jarna-round-logo.svg' if name=='logo.svg' else 'noun-tiger.svg'))
-for name in ['favicon.svg','favicon.ico','favicon-16.png','favicon-32.png','favicon-48.png','apple-touch-icon.png','icon-192.png','icon-512.png','icon-maskable-512.png']:
+# only what the app references
+shutil.copy2(HERE/'logo.svg',ROOT/'app/img/jarna-round-logo.svg')
+shutil.copy2(HERE/'og-image.png',ROOT/'app/img/og-image.png')
+for name in ['favicon.svg','favicon.ico','apple-touch-icon.png','icon-192.png','icon-512.png','icon-maskable-512.png']:
  shutil.copy2(HERE/name,ROOT/'app/icons'/('noun-tiger-'+name))
 print('Built circular logo, outlined text, text-free favicon and app icons.')

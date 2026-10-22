@@ -1,6 +1,13 @@
 {
   "school": "Järna Kung Fu & Kultur",
   "program": "Kung Fu Fitness",
+  "members": {
+    "text": "Appen är till för medlemmar i Järna Kung Fu & Kultur.",
+    "link": {
+      "text": "jarnakungfu.com",
+      "url": "https://www.jarnakungfu.com/"
+    }
+  },
   "principles": [
     {
       "title": "Träna lite och ofta",
@@ -111,6 +118,16 @@
           "Där satt den.",
           "Bra jobbat idag. Ta ett par djupa andetag, och ta med dig känslan resten av dagen."
         ]
+      },
+      "music": {
+        "file": "music/doobie-sadeh-zen-184375.mp3",
+        "delay": 8,
+        "credit": {
+          "by": "Doobie Sadeh",
+          "byUrl": "https://pixabay.com/users/redproductions-970568/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=184375",
+          "from": "Pixabay",
+          "fromUrl": "https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=184375"
+        }
       }
     },
     {
@@ -157,7 +174,7 @@
       },
       {
         "title": "Live-coachen",
-        "text": "När du pratar med live-coachen skickas din röst till ElevenLabs, som gör om den till text och svarar med röst. Svaren formuleras av en AI-modell från Anthropic. Båda är företag i USA. Ljudet sparas inte. Samtalet sparas som text i {days} dagar så att coachen kan förbättras, sedan raderas det. Live-coachen används bara om du har godkänt det, och du kan ångra dig när som helst – inspelad röst och tyst skickar ingenting.",
+        "text": "När du pratar med live-coachen skickas din röst till ElevenLabs, som gör om den till text och svarar med röst. Svaren formuleras av en AI-modell från Anthropic. Båda är företag i USA. Ljudet sparas inte. Samtalet sparas som text i {days} dagar så att coachen kan förbättras, sedan raderas det. Live-coachen används bara om du har godkänt det, och du kan ångra dig när som helst – inspelad röst och tyst skickar ingenting. Vill du att ditt samtal raderas tidigare? Kontakta {contact} och berätta ungefär när du tränade. Du kan också vända dig till Integritetsskyddsmyndigheten (IMY).",
         "liveOnly": true
       },
       {
@@ -166,7 +183,11 @@
       },
       {
         "title": "Vem driver appen?",
-        "text": "Appen drivs av {owner} som privatperson och är inte kopplad till Järna Kung Fu & Kultur. Det är {owner} som ansvarar för uppgifterna som beskrivs här. Vill du veta vad som har sparats om dig, eller få det raderat? Kontakta {contact} och berätta ungefär när du tränade. Du kan också vända dig till Integritetsskyddsmyndigheten (IMY)."
+        "text": "Appen är till för medlemmar i Järna Kung Fu & Kultur. Den drivs av {owner} som privatperson, inte av klubben, och {owner} sparar inga uppgifter om dig. Frågor om integritet? Kontakta {contact}.",
+        "link": {
+          "text": "Till klubbens webbplats, jarnakungfu.com",
+          "url": "https://www.jarnakungfu.com/"
+        }
       }
     ],
     "withdraw": "Ångra godkännandet för live-coachen",
@@ -218,5 +239,13 @@
       "how": "Visa hur",
       "install": "Installera"
     }
+  },
+  "feedback": {
+    "draft": "Utkast skrivet av Claude – granska.",
+    "title": "Fel eller förslag?",
+    "sub": "Mejla {email}",
+    "email": "support@thinksmall.studio",
+    "subject": "Kung Fu Fitness: fel eller förslag",
+    "body": "Vad hände, eller vad vill du ändra?\n\n\nTelefon och webbläsare:\n"
   }
 }

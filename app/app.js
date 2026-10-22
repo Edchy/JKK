@@ -9,6 +9,7 @@
 //   #/kor/<pass>/<n>         guided session with voice (see voice.js)
 
 import { createSpeaker } from "./voice.js";
+import { createMusic } from "./music.js";
 import { exerciseLines, cueLines, finished } from "./speech.js";
 import { createLiveCoach, TEXT_ONLY } from "./live-coach.js";
 import { exerciseContext, openingNote, resumeNote, pauseNote, unpauseNote, repeatNote, finishNote, asToolResult } from "./coach-context.js";
@@ -131,9 +132,9 @@ function homeView() {
     <h2 class="section-title">Utforska</h2>
     <ul class="list">
       ${[
-        ["#/ovningar", "taichi", "Övningar", `${exercises.size} övningar · ${site.animals.map((a) => a.name).join(", ")}`],
-        ["#/ordbok", "book-open", "Ordbok", `${glossary.length} ord`],
-        ["#/info", "info", "Innan du börjar", "Läs det här först"],
+        ["#/ovningar", "nav-ovningar", "Övningar", `${exercises.size} övningar · ${site.animals.map((a) => a.name).join(", ")}`],
+        ["#/ordbok", "nav-ordbok", "Ordbok", `${glossary.length} ord`],
+        ["#/info", "nav-info", "Innan du börjar", "Läs det här först"],
       ]
         .map(
           ([href, icon, name, sub]) => `<li><a class="row" href="${href}">
@@ -142,7 +143,8 @@ function homeView() {
             ${arrow}</a></li>`
         )
         .join("")}
-    </ul>`;
+    </ul>
+    <p class="home-note">${esc(site.members.text)} <a href="${esc(site.members.link.url)}" target="_blank" rel="noopener">${esc(site.members.link.text)}</a></p>`;
   wireInstallBanner();
 }
 
@@ -189,34 +191,88 @@ function libraryView() {
 }
 
 // ---------- Inställningar (behind the cog on Hem) ----------
+// Utseende: Papper (the default), Siden, Lotus or Wudang (dark). The colours are in style.css
+// (:root[data-theme="…"]); index.html applies a saved choice before the first paint
+// (add a new theme's id to its list too).
+const THEMES = [
+  { id: "papper", label: "Papper" },
+  { id: "siden", label: "Siden" },
+  { id: "lotus", label: "Lotus" },
+  { id: "wudang", label: "Wudang" },
+];
+const THEME_KEY = "jkk-theme";
+const theme = () => (THEMES.some((t) => t.id === document.documentElement.dataset.theme) ? document.documentElement.dataset.theme : "papper");
+const themeChoice = () =>
+  `<div class="theme-picker" role="radiogroup" aria-label="Utseende">${THEMES.map(
+    (t) => `<button class="theme-opt" role="radio" data-theme-choice="${t.id}" aria-checked="${t.id === theme()}">
+        <span class="theme-preview" aria-hidden="true"><span class="tp-card"></span><span class="tp-btn"></span><span class="tp-bar"><span class="tp-tab"></span></span></span>${esc(t.label)}
+      </button>`
+  ).join("")}</div>`;
+function setTheme(id) {
+  const apply = () => {
+    if (id === "papper") delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = id;
+    document.querySelectorAll("[data-theme-choice]").forEach((b) => b.setAttribute("aria-checked", b.dataset.themeChoice === id));
+    syncThemeColor();
+  };
+  try { id === "papper" ? localStorage.removeItem(THEME_KEY) : localStorage.setItem(THEME_KEY, id); } catch {}
+  // a short cross-fade where the browser can (View Transitions), instant elsewhere
+  if (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) document.startViewTransition(apply);
+  else apply();
+}
+// the browser's own bar (and the installed app's status bar) follows the page colour
+function syncThemeColor() {
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", getComputedStyle(document.documentElement).getPropertyValue("--bg").trim());
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-theme-choice]");
+  if (b && b.dataset.themeChoice !== theme()) setTheme(b.dataset.themeChoice);
+});
+syncThemeColor();
+// "Fel eller förslag?": opens the student's mail app with the address and a
+// short template filled in (index.json → feedback)
+function feedbackRow() {
+  const f = site.feedback;
+  const href = `mailto:${f.email}?subject=${encodeURIComponent(f.subject)}&body=${encodeURIComponent(f.body)}`;
+  return `<a class="row" href="${esc(href)}"><div><div class="name">${esc(f.title)}</div>
+      <div class="sub">${esc(f.sub.replace("{email}", f.email))}</div></div>${arrow}</a>`;
+}
+// Not in the tab bar, so these pages get a ✕ where the cog sits on Hem: one level up.
+const pageHead = (title, up, label) =>
+  `<div class="page-head with-close"><h1 class="page-title">${esc(title)}</h1>
+    <a class="icon-btn" href="${up}" aria-label="${esc(label)}">${ic("x")}</a></div>`;
 function settingsView() {
   setPage({ title: "Inställningar" });
   view.innerHTML = `
-    <div class="page-head"><h1 class="page-title">Inställningar</h1></div>
+    ${pageHead("Inställningar", "#/", "Stäng inställningar")}
+    <section class="settings-group">
+      <h2 class="section-title">Röst under passet</h2>
+      ${voiceChoice(site.passes.some((p) => p.music))}
+    </section>
+    <section class="settings-group">
+      <h2 class="section-title">Utseende</h2>
+      ${themeChoice()}
+    </section>
     ${
-      VOICE
-        ? `<section class="settings-group">
-            <h2 class="section-title">Röst under passet</h2>
-            ${voiceChoice()}
-          </section>`
-        : ""
-    }
-    ${
-      VOICE && prefs.liveOk
+      LIVE && prefs.liveOk
         ? `<section class="settings-group">
             <h2 class="section-title">Live-coachen</h2>
-            <p class="lead">Du har godkänt att prata med live-coachen.</p>
-            <button class="sheet-link" data-withdraw>${ic("x")}${esc(site.privacy.withdraw)}</button>
+            <div class="settings-card">
+              <p>Du har godkänt att prata med live-coachen.</p>
+              <button class="sheet-link" data-withdraw>${ic("x")}${esc(site.privacy.withdraw)}</button>
+            </div>
           </section>`
         : ""
     }
     <ul class="list settings-links">
       <li><a class="row" href="#/installera"><div><div class="name">${esc(site.install.title)}</div></div>${arrow}</a></li>
       <li><a class="row" href="#/installningar/integritet"><div><div class="name">${esc(site.privacy.link)}</div></div>${arrow}</a></li>
+      <li>${feedbackRow()}</li>
     </ul>
+    ${musicCredits()}
     ${
       TESTER
-        ? `<p class="tester-note">Testläge: rösten är på för den här telefonen. <a href="?tester=off#/installningar">Stäng av</a></p>`
+        ? `<p class="tester-note">Testläge: live-coachen är på för den här telefonen. <a href="?tester=off#/installningar">Stäng av</a></p>`
         : // an app saved to the iPhone home screen has its own storage and no address bar,
           // so ?tester=… can't reach it – the code can be typed here instead
           `<details class="tester-note"><summary>Testkod</summary>
@@ -241,7 +297,7 @@ function passView(p) {
       <h1 class="page-title">${esc(p.title)}</h1>
       <p class="lead">${list.length} övningar. Gör dem i ordning.</p>
       <button class="btn start-btn" data-start="${p.id}">${ic("play")}Starta pass</button>
-      ${voiceChoice()}
+      ${voiceChoice(!!p.music)}
     </div>
     ${exerciseRows(list, `#/pass/${p.id}`, true)}`;
 }
@@ -292,11 +348,13 @@ function privacyView() {
   const pr = site.privacy;
   setPage({ title: pr.title });
   view.innerHTML = `
-    <div class="page-head"><h1 class="page-title">${esc(pr.title)}</h1></div>
+    ${pageHead(pr.title, "#/installningar", "Tillbaka till inställningar")}
     <section class="privacy" id="integritet">
       <dl class="glossary">${pr.sections
-        .filter((s) => VOICE || !s.liveOnly)
-        .map((s) => `<div class="term"><dt>${esc(s.title)}</dt><dd>${esc(privacyText(s.text))}</dd></div>`)
+        .filter((s) => LIVE || !s.liveOnly)
+        .map((s) => `<div class="term"><dt>${esc(s.title)}</dt><dd>${esc(privacyText(s.text))}${
+          s.link ? `<a class="privacy-link" href="${esc(s.link.url)}" target="_blank" rel="noopener">${esc(s.link.text)}</a>` : ""
+        }</dd></div>`)
         .join("")}</dl>
     </section>`;
 }
@@ -333,8 +391,8 @@ document.addEventListener("click", (e) => {
 // ---------- Glossary word sheet ----------
 const SHEETS = {
   mode: {
-    title: () => "Röst under passet",
-    body: () => modePicker(),
+    title: () => (run?.pass.music ? "Röst och musik" : "Röst under passet"),
+    body: () => modePicker() + (run?.pass.music ? `<div class="sheet-music">${musicSwitch()}</div>` : ""),
   },
   consent: {
     title: () => site.privacy.live.title,
@@ -616,12 +674,13 @@ const CUE_EVERY = 25000;   // then this often, until the exercise's cues run out
 let t0 = 0;
 const log = (...a) => console.debug(`[voice] ${((performance.now() - t0) / 1000).toFixed(2)}s`, ...a);
 
-// ---- Test mode: all voice is only for the owner while it's being tested ----
-// Open the app once with ?tester=<code> (or type it under Inställningar → Testkod)
-// and this phone remembers the code. Without it there is no voice at all: no
-// choice, no recorded voice, no live coach – just the exercises. The real lock
-// for the live coach is on the server: worker.js only hands out tickets when the
-// code (sent as X-Tester) matches its TESTER_KEY secret. Locally, voice is on.
+// ---- Test mode: the live coach is only for the owner while it's being tested ----
+// (it costs per minute). Open the app once with ?tester=<code> (or type it under
+// Inställningar → Testkod) and this phone remembers the code. Without it the
+// student chooses between Tyst and Inspelad röst – the recorded voice is free and
+// works offline. The real lock for the live coach is on the server: worker.js only
+// hands out tickets when the code (sent as X-Tester) matches its TESTER_KEY
+// secret. Locally, the live coach is on.
 const TESTER = (() => {
   const fromUrl = new URLSearchParams(location.search).get("tester");
   try {
@@ -633,7 +692,7 @@ const TESTER = (() => {
     return fromUrl && fromUrl !== "off" ? fromUrl : "";
   }
 })();
-const VOICE = !!TESTER || ["localhost", "127.0.0.1"].includes(location.hostname);
+const LIVE = !!TESTER || ["localhost", "127.0.0.1"].includes(location.hostname);
 
 // ---- Voice mode: the student's choice, remembered on this phone ----
 const MODES = [
@@ -641,24 +700,50 @@ const MODES = [
   { id: "recorded", label: "Inspelad röst", sub: "Fungerar utan internet", icon: "sound" },
   { id: "live", label: "Live-coach", sub: "Prata med coachen · kräver internet", icon: "waveform" },
 ];
+const modes = () => (LIVE ? MODES : MODES.filter((m) => m.id !== "live"));
 const prefs = (() => {
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem("jkk-voice") || "{}"); } catch {}
-  // earlier versions only had sound on/off
-  const mode = MODES.some((m) => m.id === saved.mode) ? saved.mode : saved.sound === false ? "silent" : "live";
+  // new phones start silent; earlier versions only had sound on/off
+  const mode = MODES.some((m) => m.id === saved.mode) ? saved.mode : "silent";
   // liveOk: the student has read what the live coach sends where (GDPR consent)
-  return { mode, liveOk: saved.liveOk === true };
+  // music: the pass's background music, on unless the student turned it off
+  return { mode, liveOk: saved.liveOk === true, music: saved.music !== false };
 })();
 const savePrefs = () => { try { localStorage.setItem("jkk-voice", JSON.stringify(prefs)); } catch {} };
 // Live mode can be replaced for this session only (the saved choice stays):
 // "recorded" when the coach couldn't connect, "silent" when the student closed the consent sheet.
 let sessionMode = null;
-const mode = () => (!VOICE ? "silent" : (prefs.mode === "live" && sessionMode) || prefs.mode);
+// A phone that chose live and no longer has the test code is silent.
+const mode = () => (prefs.mode !== "live" ? prefs.mode : LIVE ? sessionMode || "live" : "silent");
 const currentMode = () => MODES.find((m) => m.id === mode());
 const voiceOn = () => mode() === "recorded";   // the recorded voice (the live coach has its own)
 
+// ---- Background music (passes[].music in index.json) ----
+// Its own on/off switch, on by default. Not with the live coach for now: the
+// microphone would hear the music.
+const music = createMusic();
+const musicFor = (p) => (prefs.music && mode() !== "live" && p?.music) || null;
+// make the music match the session: start it (after the pass's delay the
+// first time), resume it after a pause, or stop it
+function syncMusic(delay) {
+  const m = run && armed && musicFor(run.pass);
+  if (!m) return music.stop();
+  if (music.playing) return music.resume();
+  music.start(m.file, delay ?? (m.delay ?? 8) * 1000);
+}
+const musicSwitch = () =>
+  `<button class="music-switch" role="switch" data-music aria-checked="${prefs.music}">${ic("music")}Musik<span class="music-state" aria-hidden="true">${prefs.music ? "På" : "Av"}</span></button>`;
+// Pixabay asks for a credit line: one per track, in Inställningar
+function musicCredits() {
+  const tracks = new Map(site.passes.filter((p) => p.music?.credit).map((p) => [p.music.file, p.music.credit]));
+  return [...tracks.values()].map((c) =>
+    `<p class="credits">Musik av <a href="${esc(c.byUrl)}" target="_blank" rel="noopener">${esc(c.by)}</a> från <a href="${esc(c.fromUrl)}" target="_blank" rel="noopener">${esc(c.from)}</a>.</p>`
+  ).join("");
+}
+
 function modePicker() {
-  return `<div class="mode-picker" role="radiogroup" aria-label="Röst under passet">${MODES.map(
+  return `<div class="mode-picker" role="radiogroup" aria-label="Röst under passet">${modes().map(
     (m) => `<button class="mode" role="radio" data-mode="${m.id}" aria-checked="${m.id === mode()}">
         ${ic(m.icon)}<span class="mode-label">${esc(m.label)}</span><span class="mode-sub">${esc(m.sub)}</span>
       </button>`
@@ -666,16 +751,19 @@ function modePicker() {
 }
 // The pass page's small version: a segmented control under Starta pass,
 // with the chosen mode's one-line description below it.
-function voiceChoice() {
-  if (!VOICE) return "";
+// withMusic: show the music switch next to it (the pass, or in settings any pass, has music)
+function voiceChoice(withMusic) {
   return `<div class="voice-choice">
-      <div class="segmented" role="radiogroup" aria-label="Röst under passet">${MODES.map(
-        (m) => `<button role="radio" data-mode="${m.id}" aria-checked="${m.id === mode()}">${ic(m.icon)}${esc(m.label)}</button>`
-      ).join("")}</div>
+      <div class="voice-row">
+        <div class="segmented" role="radiogroup" aria-label="Röst under passet">${modes().map(
+          (m) => `<button role="radio" data-mode="${m.id}" aria-checked="${m.id === mode()}">${ic(m.icon)}${esc(m.label)}</button>`
+        ).join("")}</div>
+        ${withMusic ? musicSwitch() : ""}
+      </div>
       <p class="mode-hint">${esc(currentMode().sub)}</p>
     </div>`;
 }
-const modeButton = () => !VOICE ? "" :
+const modeButton = () =>
   `<button class="icon-btn" data-act="mode" aria-haspopup="dialog" aria-label="Röst: ${esc(currentMode().label)}. Byt">${ic(currentMode().icon)}</button>`;
 
 // choose a mode – from the pass page or from the sheet during a session
@@ -692,11 +780,26 @@ document.addEventListener("click", (e) => {
   if (run && armed) applyMode();
 });
 
+// music on/off – from the pass page, settings or the sheet during a session
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("[data-music]")) return;
+  prefs.music = !prefs.music;
+  savePrefs();
+  document.querySelectorAll("[data-music]").forEach((el) => {
+    el.setAttribute("aria-checked", prefs.music);
+    el.querySelector(".music-state").textContent = prefs.music ? "På" : "Av";
+  });
+  if (run && armed) syncMusic(500);
+});
+
 // switching mid-session: stop what's playing and continue in the new mode
 function applyMode() {
   view.querySelector('[data-act="mode"]')?.replaceWith(htmlToNode(modeButton()));
+  // "listen again" and pause only mean something when a voice is on
+  view.querySelectorAll('[data-act="repeat"], [data-act="pause"]').forEach((b) => (b.hidden = mode() === "silent"));
   speaker.stop();
   clearTimeout(run.cueTimer);
+  syncMusic(1500);
   if (mode() === "live") return startLive();
   stopLive();
   if (voiceOn()) { speaker.unlock(); speak(Math.max(0, run.line)); }
@@ -845,6 +948,7 @@ function arm() {
   log("tap");
   armed = true;
   if (voiceOn()) speaker.unlock();
+  music.unlock();
   keepAwake(true);
 }
 
@@ -861,7 +965,7 @@ function sessionView(p, i) {
     view.innerHTML = `<div class="run-ready">
         <div class="eyebrow">Guidat pass</div>
         <h1 class="page-title">${esc(p.title)}</h1>
-        <p class="lead">${list.length} övningar. ${VOICE ? "En röst guidar dig – tryck" : "Tryck"} på Nästa när du vill gå vidare.</p>
+        <p class="lead">${list.length} övningar. ${mode() !== "silent" ? "En röst guidar dig – tryck" : "Tryck"} på Nästa när du vill gå vidare.</p>
         <button class="btn start-btn" data-act="arm">${ic("play")}Starta</button>
         <a class="sheet-link" href="#/pass/${p.id}">Avbryt</a>
       </div>`;
@@ -899,15 +1003,16 @@ function renderStep() {
     <div class="run-live" data-state="${live?.state || ""}" ${mode() === "live" && live ? "" : "hidden"}><span class="dot" aria-hidden="true"></span><span class="t">${esc(LIVE_TEXT[live?.state] || "")}</span></div>
     <div class="run-controls" role="toolbar" aria-label="Styr passet">
       <button data-act="prev" aria-label="Föregående övning" ${i === 0 ? "disabled" : ""}>${ic("arrow-left")}</button>
-      ${VOICE ? `<button data-act="repeat" aria-label="${mode() === "live" ? "Be coachen förklara igen" : "Lyssna igen"}">${ic("repeat")}</button>` : ""}
+      <button data-act="repeat" aria-label="${mode() === "live" ? "Be coachen förklara igen" : "Lyssna igen"}" ${mode() === "silent" ? "hidden" : ""}>${ic("repeat")}</button>
       <button class="done-btn" data-act="next">${i === n - 1 ? `${ic("check")}Avsluta` : `Nästa${ic("arrow-right")}`}</button>
-      ${VOICE ? `<button data-act="pause" aria-label="Pausa rösten">${ic("pause")}</button>` : ""}
+      <button data-act="pause" aria-label="Pausa rösten" ${mode() === "silent" ? "hidden" : ""}>${ic("pause")}</button>
     </div>`;
 
   run.lines = exerciseLines({ pass: p, coach: site.coach, ex, i, n, first: run.first });
   run.cues = cueLines(ex);
   run.first = false;
 
+  syncMusic(); // the first exercise starts the pass's music; later ones resume it after a pause
   if (mode() !== "live") return speak(0);
   if (!live) return startLive();
   if (liveAnnounce) live.say(exerciseContext(p, list, i)); // the student tapped – tell the coach
@@ -961,6 +1066,7 @@ function working(r) {
 function finish() {
   clearTimeout(run.cueTimer);
   speaker.stop();
+  music.stop(3000);
   const p = run.pass;
   document.body.classList.add("in-session");
   view.innerHTML = `<div class="run-finish">
@@ -1000,12 +1106,14 @@ function command(cmd) {
       return goTo(i - 1);
     case "repeat": return isLive ? live.say(repeatNote()) : speak(0);
     case "pause":
+      music.pause();
       run.paused = true;
       setPauseButton();
       if (isLive) return live.pause(pauseNote());
       speaker.stop();
       return clearTimeout(run.cueTimer);
     case "resume":
+      music.resume();
       if (isLive) {
         run.paused = false;
         setPauseButton();
@@ -1048,6 +1156,7 @@ function leaveSession() {
   if (run) clearTimeout(run.cueTimer);
   document.body.classList.remove("in-session");
   speaker.stop();
+  music.stop();
   stopLive();
   sessionMode = null;
   keepAwake(false);

@@ -4,6 +4,8 @@
 //   node tools/generate-voice.mjs --models    list text-to-speech models (and whether they speak Swedish)
 //   node tools/generate-voice.mjs --dry-run   show what would be recorded, and how many characters
 //   node tools/generate-voice.mjs --sample    record only the first exercise of the first pass, its cues and the finish (to test the voice)
+//   node tools/generate-voice.mjs --only <id> record only what's said for that exercise (a cheap test of new text);
+//                                             combine with --dry-run to see it first
 //   node tools/generate-voice.mjs             record missing clips, update app/audio/index.json,
 //                                             delete clips that are no longer used
 //
@@ -104,7 +106,22 @@ function sampleLines() {
   const said = exerciseLines({ pass, coach, ex, i: 0, n: list.length, first: true });
   return [...new Set([...said.map((l) => l.text), ...cueLines(ex), ...finished(pass, coach)])];
 }
-const lines = sample ? sampleLines() : allLines({ passes, exercises, coach });
+// --only <id>: the lines said when that exercise comes up in a pass (including
+// the transition before it) and its cues
+const onlyId = process.argv.includes("--only") ? process.argv[process.argv.indexOf("--only") + 1] : null;
+function onlyLines(id) {
+  const out = [];
+  for (const pass of passes) {
+    const list = pass.exercises.map((x) => exercises.find((e) => e.id === x)).filter(Boolean);
+    list.forEach((ex, i) => {
+      if (ex.id !== id) return;
+      out.push(...exerciseLines({ pass, coach, ex, i, n: list.length, first: i === 0 }).map((l) => l.text), ...cueLines(ex));
+    });
+  }
+  if (!out.length) { console.error(`No pass contains an exercise "${id}".`); process.exit(1); }
+  return [...new Set(out)];
+}
+const lines = onlyId ? onlyLines(onlyId) : sample ? sampleLines() : allLines({ passes, exercises, coach });
 
 const fileFor = (text) =>
   createHash("sha1").update(JSON.stringify([VOICE, MODEL, SETTINGS, text])).digest("hex").slice(0, 16) + ".mp3";
@@ -137,7 +154,7 @@ const queue = [...missing];
 await Promise.all(Array.from({ length: 2 }, async () => { while (queue.length) await record(queue.shift()); }));
 
 // ---- manifest + prune ----
-// the manifest only lists clips that exist; the app uses the device voice for the rest
+// the manifest only lists clips that exist; the app stays silent for the rest
 const recorded = Object.fromEntries(Object.entries(all).filter(([, f]) => existsSync(join(outDir, f))));
 writeFileSync(join(outDir, "index.json"), JSON.stringify({ voice: VOICE, model: MODEL, clips: recorded }, null, 2) + "\n");
 const keep = new Set(Object.values(all));

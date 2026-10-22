@@ -12,9 +12,10 @@
 //     "cues":  ["Andas lugnt.", ...]                   // spoken now and then while you work
 //   }
 
-// read numbers and dashes the way a person would
+// read numbers, dashes and "ca 50" the way a person would (a voice may spell out "ca")
 export const spoken = (t) =>
-  t.replace(/(\d+)\s*[-–]\s*(\d+)/g, "$1 till $2").replace(/\s*%/g, " procent").replace(/\s[-–]\s/g, ", ").trim();
+  t.replace(/(\d+)\s*[-–]\s*(\d+)/g, "$1 till $2").replace(/\s*%/g, " procent").replace(/\s[-–]\s/g, ", ")
+    .replace(/\b([Cc])a\.? (?=\d)/g, (_, c) => (c === "C" ? "Cirka " : "cirka ")).trim();
 
 const pick = (arr, i) => (arr?.length ? arr[i % arr.length] : null);
 

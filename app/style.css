@@ -16,8 +16,18 @@
   --on-accent: var(--bg);
   --muted: #5c5850;
   --faint: #6a655b;
-  --line: rgb(42 41 38 / 14%);
-  --on-ink-muted: #b8b2a6; /* idle text on dark surfaces (tab bar) */
+  --line: color-mix(in srgb, var(--ink) 14%, transparent);
+  /* chrome: the dark surfaces (tab bar, install banner) */
+  --chrome: var(--ink);
+  --on-chrome: var(--bg);
+  --on-chrome-muted: #b8b2a6; /* idle text on the chrome */
+  --chrome-active: var(--bg);  /* the current tab's pill */
+  --on-chrome-active: var(--ink);
+  --logo: var(--ink);
+  --emblem: var(--ink);        /* the round icons on Hem's rows */
+  --shadow: var(--ink);        /* shadows and the dimmed backdrop (black in a dark theme) */
+  --raised: var(--bg);         /* the chosen option on a switcher's track */
+  --field: var(--paper);       /* text fields, the little key icons in the install guide */
 
   --display: "Fraunces", Georgia, serif;
   --body: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -69,7 +79,89 @@
   --i-dots: url("icons/ui/regular/dots-three-circle.svg");
   --i-add: url("icons/ui/regular/plus-square.svg");
   --i-phone: url("icons/ui/regular/device-mobile.svg");
+  --i-music: url("icons/ui/regular/music-notes.svg"); /* drawn in Phosphor's style */
+  /* bottom tab bar: solid icons from the Noun Project (icons/ui/nav/) */
+  --i-nav-hem: url("icons/ui/nav/hem.svg");
+  --i-nav-pass: url("icons/ui/nav/pass.svg");
+  --i-nav-ovningar: url("icons/ui/nav/ovningar.svg");
+  --i-nav-ordbok: url("icons/ui/nav/ordbok.svg");
+  --i-nav-info: url("icons/ui/nav/info.svg"); /* Hem's "Innan du börjar" row, same family as the tab bar */
 }
+
+/* Siden: the colours of Ming-era silk coats (Inställningar → Utseende).
+   Ivory page, mauve-tinted cards, lacquer-red actions, a jade tab bar with a
+   gold pill for the current tab. Only colour roles change; every text pair
+   is ≥5:1 (checked), so it reads as well as Papper. */
+:root[data-theme="siden"] {
+  --bg: #f6ebd6;           /* ivory coat */
+  --surface: #eedcd0;      /* mauve coat, very pale */
+  --paper: #fdf7ec;        /* white sleeves */
+  --ink: #36201b;          /* lacquer brown */
+  --accent: #9e2b2e;       /* lacquer red, the wall behind them */
+  --on-accent: #fbf3e4;
+  --muted: #6f4f48;        /* mauve, deepened for text */
+  --faint: #86655c;
+  --chrome: #2f3d28;       /* jade coat, deep */
+  --on-chrome: #f6ebd6;
+  --on-chrome-muted: #bcc3a2;
+  --chrome-active: #d9b27a; /* gold crowns */
+  --on-chrome-active: #2f3d28;
+  --logo: var(--accent);    /* the logo as a red seal */
+  --emblem: var(--chrome);  /* jade, so the green reaches the page too */
+}
+/* Lotus: a lotus pond at dawn. Misty page, leaf-green cards, pond-green ink
+   and tab bar, lotus pink for actions with a petal-pink pill for the current
+   tab. The mirror of Siden: here the logo is green and the icons are pink. */
+:root[data-theme="lotus"] {
+  --bg: #eff2e8;           /* morning mist over the water */
+  --surface: #e1e9d8;      /* lotus leaf, pale */
+  --paper: #f9fbf5;
+  --ink: #1f3329;          /* deep pond */
+  --accent: #ad3a60;       /* lotus flower, deep */
+  --on-accent: #fff6f8;
+  --muted: #4c6254;        /* reed */
+  --faint: #687b6d;
+  --chrome: #23473b;       /* pond green */
+  --on-chrome: #eff2e8;
+  --on-chrome-muted: #a8c3b2;
+  --chrome-active: #f2bccb; /* petal */
+  --on-chrome-active: #23473b;
+  --logo: var(--chrome);
+  --emblem: var(--accent);
+}
+/* Wudang: the mountain of tai chi (and of the Wu-Tang Clan's name) at night.
+   Pine-dark page, lantern yellow for actions, the logo as a yellow seal on
+   black, pine-mist icons. Designed for the dark, not inverted: cards are
+   lighter than the page, shadows are black, the chosen option is raised.
+   The illustrations are black ink, so they keep a parchment tile. */
+:root[data-theme="wudang"] {
+  color-scheme: dark;      /* the browser's own parts: scrollbars, form controls */
+  --bg: #121614;           /* mountain night */
+  --surface: #1c221f;
+  --raised: #2c3430;
+  --field: #232a26;
+  --paper: #d8d0be;        /* parchment, softer than white at night */
+  --ink: #ebe5d7;
+  --accent: #e9b949;       /* lantern yellow */
+  --on-accent: #17140c;
+  --muted: #a9a596;
+  --faint: #8d8a7e;
+  --line: color-mix(in srgb, var(--ink) 12%, transparent);
+  --chrome: #262e2a;
+  --on-chrome: #ebe5d7;
+  --on-chrome-muted: #a3a99d;
+  --chrome-active: var(--accent);
+  --on-chrome-active: #17140c;
+  --logo: var(--accent);
+  --emblem: #9cc0a9;       /* pine mist */
+  --shadow: #000;
+}
+/* (every theme but Papper) the logo is drawn in --logo through a mask; the img stays for its alt text */
+:root[data-theme] .home-brand {
+  background: var(--logo);
+  -webkit-mask: url("img/jarna-round-logo.svg") center / contain no-repeat; mask: url("img/jarna-round-logo.svg") center / contain no-repeat;
+}
+:root[data-theme] .home-brand .home-logo { opacity: 0; }
 
 /* ---------- Base ---------- */
 /* hidden always wins – component styles like .btn { display: inline-flex } must not override it */
@@ -91,7 +183,7 @@ a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
 main:focus-visible { outline: none; }
-.tab:focus-visible { outline-color: var(--bg); outline-offset: 1px; }
+.tab:focus-visible { outline-color: var(--on-chrome); outline-offset: 1px; }
 ::selection { background: var(--accent); color: var(--on-accent); }
 
 .art { mix-blend-mode: multiply; }
@@ -131,15 +223,29 @@ main:focus-visible { outline: none; }
 .i-repeat { --icon: var(--i-repeat); }
 .i-pause { --icon: var(--i-pause); }
 .i-waveform { --icon: var(--i-waveform); }
+.i-music { --icon: var(--i-music); }
+.i-nav-hem { --icon: var(--i-nav-hem); }
+.i-nav-pass { --icon: var(--i-nav-pass); }
+.i-nav-ovningar { --icon: var(--i-nav-ovningar); }
+.i-nav-ordbok { --icon: var(--i-nav-ordbok); }
+.i-nav-info { --icon: var(--i-nav-info); }
 
 /* ---------- Page heading ---------- */
 .page-head { padding: var(--sp-6) 0 var(--sp-6); }
+/* title with a ✕ on the right (Inställningar, Integritet) */
+/* the ✕ sits exactly where the cog is on Hem, so the same tap opens and closes; the title keeps its usual place */
+.page-head.with-close { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-4); padding-top: var(--sp-3); }
+.page-head.with-close .page-title { margin-top: calc(var(--sp-6) - var(--sp-3)); }
+.page-head.with-close .icon-btn { background: transparent; color: var(--muted); }
+.page-head.with-close .icon-btn:hover { background: var(--surface); color: var(--ink); }
 .home-logo { display: block; width: min(100%, 22rem); height: auto; margin: 0 auto; border-radius: var(--r-card); }
 
 /* ---------- Hem: an overview ---------- */
-.home-top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-4); padding: var(--sp-3) 0 var(--sp-6); }
+/* logo centred, cog top right: the empty first column balances the cog's */
+.home-top { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: var(--sp-4); padding: var(--sp-3) 0 var(--sp-6); }
+.home-brand { grid-column: 2; }
 .home-brand .home-logo { width: 8.5rem; margin: 0; border-radius: 0; }
-.home-top .icon-btn { background: transparent; color: var(--muted); }
+.home-top .icon-btn { grid-column: 3; justify-self: end; background: transparent; color: var(--muted); }
 .home-top .icon-btn:hover { background: var(--surface); color: var(--ink); }
 .list + .section-title { margin-top: var(--sp-6); }
 .pass-item { display: flex; align-items: center; }
@@ -147,7 +253,7 @@ main:focus-visible { outline: none; }
 .pass-item .btn { margin-right: var(--sp-4); flex: none; }
 .row-icon {
   flex: none; display: grid; place-items: center; width: 44px; height: 44px;
-  border-radius: 50%; background: var(--bg); color: var(--ink);
+  border-radius: 50%; background: var(--bg); color: var(--emblem);
 }
 .row-icon .i { width: 22px; height: 22px; }
 
@@ -159,6 +265,10 @@ main:focus-visible { outline: none; }
 .settings-group .lead { margin-top: 0; }
 .list.settings-links { margin-top: var(--sp-6); }
 .settings-group .voice-choice { margin-top: 0; }
+/* a status and its action, as a card like the rows below */
+.settings-card { padding: var(--sp-4) var(--sp-5) var(--sp-5); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); }
+.settings-card p { color: var(--muted); }
+.settings-card .sheet-link { margin-top: var(--sp-3); }
 .tester-note { margin-top: var(--sp-6); font-size: 0.8125rem; color: var(--muted); }
 .tester-note a { text-decoration: underline; text-underline-offset: 2px; }
 .tester-note summary { cursor: pointer; width: fit-content; }
@@ -167,35 +277,35 @@ main:focus-visible { outline: none; }
 .install-banner {
   position: relative; display: flex; gap: var(--sp-4); align-items: flex-start;
   margin-bottom: var(--sp-6); padding: var(--sp-5); padding-right: var(--sp-6);
-  border-radius: var(--r-card); background: var(--ink); color: var(--bg);
+  border-radius: var(--r-card); background: var(--chrome); color: var(--on-chrome);
 }
-.install-banner .row-icon { width: auto; height: auto; background: none; color: var(--bg); }
+.install-banner .row-icon { width: auto; height: auto; background: none; color: var(--on-chrome); }
 .install-banner .row-icon .i { width: 28px; height: 28px; }
 .install-banner-body { min-width: 0; }
 .install-banner-title { font-family: var(--display); font-size: var(--name-size); line-height: 1.2; }
-.install-banner p { margin-top: var(--sp-1); font-size: 0.875rem; color: var(--on-ink-muted); }
+.install-banner p { margin-top: var(--sp-1); font-size: 0.875rem; color: var(--on-chrome-muted); }
 .install-banner-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-4); }
-.install-banner .btn { background: var(--bg); color: var(--ink); }
-.install-banner .btn.ghost { background: transparent; color: var(--bg); box-shadow: inset 0 0 0 1px rgb(243 239 230 / 0.35); }
+.install-banner .btn { background: var(--chrome-active); color: var(--on-chrome-active); }
+.install-banner .btn.ghost { background: transparent; color: var(--on-chrome); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--on-chrome) 35%, transparent); }
 .banner-close {
   position: absolute; top: var(--sp-2); right: var(--sp-2); display: grid; place-items: center;
-  width: 36px; height: 36px; border: 0; border-radius: 50%; background: none; color: var(--on-ink-muted); cursor: pointer;
+  width: 36px; height: 36px; border: 0; border-radius: 50%; background: none; color: var(--on-chrome-muted); cursor: pointer;
 }
-.banner-close:hover { color: var(--bg); }
+.banner-close:hover { color: var(--on-chrome); }
 .install-now { margin-top: var(--sp-5); }
 .install-tabs { margin-bottom: var(--sp-5); }
-.install-tabs button[aria-selected="true"] { background: var(--bg); color: var(--ink); box-shadow: 0 1px 3px rgb(42 41 38 / 0.12); }
+.install-tabs button[aria-selected="true"] { background: var(--raised); color: var(--ink); box-shadow: 0 1px 3px color-mix(in srgb, var(--shadow) 12%, transparent); }
 .install-steps strong { font-weight: 600; }
 .key-icon {
   display: inline-grid; place-items: center; width: 30px; height: 30px; margin-left: 2px; vertical-align: middle;
-  border-radius: 8px; background: var(--paper); border: 1px solid var(--line); color: var(--ink); margin-right: 2px;
+  border-radius: 8px; background: var(--field); border: 1px solid var(--line); color: var(--ink); margin-right: 2px;
 }
 .key-icon .i { width: 18px; height: 18px; }
 .install-shot { display: block; width: min(100%, 16rem); margin-top: var(--sp-3); border-radius: var(--r-card); border: 1px solid var(--line); }
 .tester-form { display: flex; gap: var(--sp-2); margin-top: var(--sp-3); }
 .tester-form input {
   flex: 1; min-width: 0; min-height: 44px; padding: 0 var(--sp-4); border: 1px solid var(--line);
-  border-radius: var(--r-pill); background: var(--paper); color: var(--ink); font: inherit; font-size: 16px; /* 16px: iOS won't zoom */
+  border-radius: var(--r-pill); background: var(--field); color: var(--ink); font: inherit; font-size: 16px; /* 16px: iOS won't zoom */
 }
 .eyebrow { font-size: 0.875rem; font-weight: 600; color: var(--muted); margin-bottom: var(--sp-3); }
 .page-title { font-size: var(--display-size); line-height: 1.05; }
@@ -310,7 +420,7 @@ html:has(.sheet[open]) { overflow: hidden; }
   background: var(--surface); color: var(--ink);
   box-shadow: 0 -8px 40px rgb(0 0 0 / 0.12);
 }
-.sheet::backdrop { background: rgb(42 41 38 / 0.5); }
+.sheet::backdrop { background: color-mix(in srgb, var(--shadow) 50%, transparent); }
 .sheet[open] { animation: sheet-in 280ms cubic-bezier(0.2, 0.8, 0.2, 1); }
 .sheet[open]::backdrop { animation: fade-in 280ms ease; }
 @keyframes sheet-in { from { transform: translateY(40px); opacity: 0; } }
@@ -355,19 +465,19 @@ button.sheet-link { border: 0; cursor: pointer; color: var(--ink); }
   bottom: calc(12px + env(safe-area-inset-bottom));
   width: min(calc(100% - 24px), 26rem); height: var(--nav-h);
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 6px;
-  background: var(--ink);
+  background: var(--chrome);
   border-radius: var(--r-pill);
-  box-shadow: 0 8px 28px rgb(42 41 38 / 0.22);
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--shadow) 22%, transparent);
 }
 .tab {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  border-radius: var(--r-pill); color: var(--on-ink-muted);
+  border-radius: var(--r-pill); color: var(--on-chrome-muted);
   font-size: 0.6875rem; font-weight: 600; line-height: 1;
   transition: background 200ms ease, color 200ms ease;
 }
 .tab .i { width: 22px; height: 22px; }
-.tab:hover { color: var(--bg); }
-.tab[aria-current="page"] { background: var(--bg); color: var(--ink); }
+.tab:hover { color: var(--on-chrome); }
+.tab[aria-current="page"] { background: var(--chrome-active); color: var(--on-chrome-active); }
 
 /* ---------- Voice mode picker (pass page + sheet in the session) ---------- */
 .mode-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-2); margin-top: var(--sp-5); }
@@ -396,9 +506,59 @@ button.sheet-link { border: 0; cursor: pointer; color: var(--ink); }
 }
 .segmented button .i { width: 16px; height: 16px; }
 .segmented button:hover { color: var(--ink); }
-.segmented button[aria-checked="true"] { background: var(--bg); color: var(--ink); box-shadow: 0 1px 3px rgb(42 41 38 / 0.12); }
+.segmented button[aria-checked="true"] { background: var(--raised); color: var(--ink); box-shadow: 0 1px 3px color-mix(in srgb, var(--shadow) 12%, transparent); }
 .segmented button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .mode-hint { margin-top: var(--sp-2); font-size: 0.8125rem; color: var(--muted); }
+/* Utseende: four tiles, each a tiny phone screen in its own theme (a card, a
+   button, the tab bar with its current-tab pill). The colours are fixed per
+   tile, not tokens: a tile shows its theme whichever theme is on. */
+.theme-picker { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-3); max-width: 24rem; }
+.theme-opt {
+  display: grid; gap: var(--sp-2); padding: 0; border: 0; background: none; cursor: pointer;
+  color: var(--muted); font-size: 0.8125rem; font-weight: 600; text-align: center;
+}
+.theme-opt:hover, .theme-opt[aria-checked="true"] { color: var(--ink); }
+.theme-preview {
+  position: relative; display: block; aspect-ratio: 4 / 5; border-radius: 12px; background: var(--t-bg);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 14%, transparent);
+  transition: box-shadow 160ms ease;
+}
+.theme-preview span { position: absolute; display: block; border-radius: var(--r-pill); }
+.theme-preview .tp-card { left: 14%; right: 14%; top: 14%; height: 28%; border-radius: 6px; background: var(--t-surface); }
+.theme-preview .tp-btn { left: 14%; top: 50%; width: 48%; height: 11%; background: var(--t-accent); }
+.theme-preview .tp-bar { left: 10%; right: 10%; bottom: 9%; height: 15%; background: var(--t-chrome); }
+.theme-preview .tp-tab { left: 6%; top: 18%; bottom: 18%; width: 32%; background: var(--t-active); }
+/* chosen: a ring around the tile, with a gap so it reads on any tile colour */
+.theme-opt[aria-checked="true"] .theme-preview { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--ink); }
+.theme-opt:focus-visible { outline: none; }
+.theme-opt:focus-visible .theme-preview { outline: 2px solid var(--ink); outline-offset: 6px; }
+[data-theme-choice="papper"] { --t-bg: #f3efe6; --t-surface: #e9e3d6; --t-accent: #2a2926; --t-chrome: #2a2926; --t-active: #f3efe6; }
+[data-theme-choice="siden"]  { --t-bg: #f6ebd6; --t-surface: #eedcd0; --t-accent: #9e2b2e; --t-chrome: #2f3d28; --t-active: #d9b27a; }
+[data-theme-choice="lotus"]  { --t-bg: #eff2e8; --t-surface: #e1e9d8; --t-accent: #ad3a60; --t-chrome: #23473b; --t-active: #f2bccb; }
+[data-theme-choice="wudang"] { --t-bg: #121614; --t-surface: #1c221f; --t-accent: #e9b949; --t-chrome: #262e2a; --t-active: #e9b949; }
+/* the cross-fade when switching theme */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 280ms; animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+/* the voice choice and the music switch side by side; they wrap on narrow phones */
+.voice-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
+/* music on/off: a pill as tall as the segmented control, its state spelled out */
+.music-switch {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 42px; padding: 0 6px 0 var(--sp-3);
+  border: 0; border-radius: var(--r-pill); background: var(--surface); color: var(--ink);
+  font-size: 0.8125rem; font-weight: 600; cursor: pointer;
+}
+.music-switch .i { width: 16px; height: 16px; }
+.music-switch .music-state {
+  min-width: 2.6em; padding: 6px 10px; border-radius: var(--r-pill); text-align: center;
+  background: var(--raised); box-shadow: 0 1px 3px color-mix(in srgb, var(--shadow) 12%, transparent);
+}
+.music-switch[aria-checked="false"] { color: var(--muted); }
+.music-switch[aria-checked="false"] .music-state { background: transparent; box-shadow: none; }
+.music-switch:hover { color: var(--ink); }
+.music-switch:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.sheet-music { margin-top: var(--sp-4); }
+.credits, .home-note { margin-top: var(--sp-6); font-size: 0.8125rem; color: var(--muted); }
+.credits a, .home-note a { text-decoration: underline; text-underline-offset: 2px; }
+.privacy-link { display: block; width: fit-content; margin-top: var(--sp-2); text-decoration: underline; text-underline-offset: 2px; }
 .sheet .mode { background: var(--bg); }
 .sheet .mode[aria-checked="true"] { background: var(--accent); }
 
@@ -447,7 +607,8 @@ body.in-session main { padding-top: calc(var(--sp-4) + env(safe-area-inset-top))
   display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
   border: 0; border-radius: var(--r-pill); background: none; cursor: pointer; font-weight: 600;
 }
-.run-controls:not(:has([data-act="pause"])) { grid-template-columns: 52px 1fr; } /* no voice: just back + Nästa */
+/* Tyst: ⟲ and pause are hidden (still in the page), so just back + Nästa */
+.run-controls:not(:has([data-act="pause"]:not([hidden]))) { grid-template-columns: 52px 1fr; }
 .run-controls button:disabled { opacity: 0.3; cursor: default; }
 .run-controls .i { width: 24px; height: 24px; }
 .run-controls .done-btn { background: var(--accent); color: var(--on-accent); font-size: 1.0625rem; }
