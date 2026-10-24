@@ -74,24 +74,36 @@
       "name": "Stretch"
     },
     {
-      "id": "bal",
-      "name": "Bål"
+      "id": "mobility",
+      "name": "Mobility"
     },
     {
-      "id": "mabu",
-      "name": "Mabu"
+      "id": "core",
+      "name": "Core"
     },
     {
-      "id": "sparkar",
-      "name": "Sparkar"
+      "id": "strength",
+      "name": "Strength"
     },
     {
-      "id": "slag",
-      "name": "Slag"
+      "id": "stance",
+      "name": "Stance"
     },
     {
-      "id": "stav",
-      "name": "Stav"
+      "id": "kick",
+      "name": "Kick"
+    },
+    {
+      "id": "punch",
+      "name": "Punch"
+    },
+    {
+      "id": "combo",
+      "name": "Combo"
+    },
+    {
+      "id": "staff",
+      "name": "Staff"
     }
   ],
   "passes": [
@@ -137,7 +149,18 @@
         "assisted-cossack",
         "axe-kicks",
         "get-ups",
-        "dynamic-squat"
+        "dynamic-squat",
+        "kick-through",
+        "mabu-staff-switch"
+      ]
+    },
+    {
+      "id": "pass-3",
+      "title": "Pass 3",
+      "exercises": [
+        "kickups-stretches",
+        "cobra-pushups",
+        "tekken-combo"
       ]
     }
   ],

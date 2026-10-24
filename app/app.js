@@ -1,9 +1,9 @@
 // Kung Fu Fitness – tiny hash-routed PWA. Content lives in content/*.json.
 //
 // Routes:
-//   #/                       home: animals + passes
-//   #/<animal>               exercises for one animal (Apa / Björn / Tiger)
-//   #/<animal>/<exercise>    exercise, prev/next within that animal
+//   #/                       home: passes + ways into the rest
+//   #/ovningar               the whole library, filtered by tag
+//   #/ovningar/<exercise>    exercise, prev/next within the filtered library
 //   #/pass/<pass>            a ready-made session
 //   #/pass/<pass>/<exercise> exercise, prev/next within that pass
 //   #/kor/<pass>/<n>         guided session with voice (see voice.js)
@@ -19,10 +19,11 @@ const view = document.getElementById("view");
 let site;
 let glossary = [];
 const exercises = new Map();
-const animals = new Map();
 const passes = new Map();
 const tagNames = new Map();
-const libFilter = { animal: "", tag: "" };   // the Övningar page's filters
+// The animals (Apa, Björn, Tiger) are hidden for now: their data stays in
+// index.json and on each exercise, but the app doesn't show or filter by them.
+const libFilter = { tag: "" };   // the Övningar page's filter
 
 // ---------- data ----------
 async function getJSON(url) {
@@ -41,7 +42,6 @@ async function loadSite() {
   if (words.length) glossRe = new RegExp(`(?<!\\p{L})(${words.join("|")})(?!\\p{L})`, "giu");
   site = index;
   lib.exercises.forEach((e) => exercises.set(e.id, e));
-  site.animals.forEach((a) => animals.set(a.id, a));
   site.passes.forEach((p) => passes.set(p.id, p));
   site.tags.forEach((t) => tagNames.set(t.id, t.name));
 }
@@ -75,7 +75,6 @@ const arrow = `<span class="arrow">${ic("arrow-right")}</span>`;
 function meta(ex) {
   const parts = [
     ex.dose && `${ic("clock")}${esc(ex.dose)}`,
-    esc(ex.animals.map((id) => animals.get(id)?.name).filter(Boolean).join(" + ")),
     ...ex.tags.map((t) => esc(tagNames.get(t) || t)),
   ].filter(Boolean);
   return parts.length ? `<p class="meta">${parts.map((p) => `<span>${p}</span>`).join("")}</p>` : "";
@@ -132,7 +131,7 @@ function homeView() {
     <h2 class="section-title">Utforska</h2>
     <ul class="list">
       ${[
-        ["#/ovningar", "nav-ovningar", "Övningar", `${exercises.size} övningar · ${site.animals.map((a) => a.name).join(", ")}`],
+        ["#/ovningar", "nav-ovningar", "Övningar", `${exercises.size} övningar`],
         ["#/ordbok", "nav-ordbok", "Ordbok", `${glossary.length} ord`],
         ["#/info", "nav-info", "Innan du börjar", "Läs det här först"],
       ]
@@ -148,11 +147,8 @@ function homeView() {
   wireInstallBanner();
 }
 
-// ---------- Övningar: the whole library, filtered by animal and/or type ----------
-const libList = () =>
-  [...exercises.values()].filter(
-    (e) => (!libFilter.animal || e.animals.includes(libFilter.animal)) && (!libFilter.tag || e.tags.includes(libFilter.tag))
-  );
+// ---------- Övningar: the whole library, filtered by type ----------
+const libList = () => [...exercises.values()].filter((e) => !libFilter.tag || e.tags.includes(libFilter.tag));
 
 function libraryView() {
   setPage({ title: "Övningar" });
@@ -162,27 +158,18 @@ function libraryView() {
       <h1 class="page-title">Övningar</h1>
       <p class="lead" id="lib-lead"></p>
     </div>
-    <div class="chips" role="group" aria-label="Djur">
-      <button class="chip" data-animal="">Alla</button>
-      ${site.animals.map((a) => `<button class="chip" data-animal="${a.id}"><span class="chip-glyph" aria-hidden="true">${esc(a.glyph)}</span>${esc(a.name)}</button>`).join("")}
-    </div>
     <div class="chips" role="group" aria-label="Typ">
       ${used.map((t) => `<button class="chip" data-tag="${t.id}">${esc(t.name)}</button>`).join("")}
     </div>
     <div id="ex-list"></div>`;
   const render = () => {
     const list = libList();
-    const a = animals.get(libFilter.animal);
-    view.querySelector("#lib-lead").textContent = a ? `${a.theme}. ${a.description}` : `${exercises.size} övningar. Filtrera på djur eller typ.`;
-    view.querySelector("#ex-list").innerHTML = list.length
-      ? exerciseRows(list, "#/ovningar", false)
-      : `<p class="empty">Inga övningar med den kombinationen.</p>`;
-    view.querySelectorAll("[data-animal]").forEach((c) => c.setAttribute("aria-pressed", c.dataset.animal === libFilter.animal));
+    view.querySelector("#lib-lead").textContent = libFilter.tag
+      ? `${list.length} av ${exercises.size} övningar.`
+      : `${exercises.size} övningar. Filtrera på typ.`;
+    view.querySelector("#ex-list").innerHTML = exerciseRows(list, "#/ovningar", false);
     view.querySelectorAll("[data-tag]").forEach((c) => c.setAttribute("aria-pressed", c.dataset.tag === libFilter.tag));
   };
-  view.querySelectorAll("[data-animal]").forEach((c) =>
-    c.addEventListener("click", () => { libFilter.animal = c.dataset.animal; render(); })
-  );
   // a type chip toggles: tap the active one again to show all types
   view.querySelectorAll("[data-tag]").forEach((c) =>
     c.addEventListener("click", () => { libFilter.tag = libFilter.tag === c.dataset.tag ? "" : c.dataset.tag; render(); })
@@ -243,12 +230,17 @@ const pageHead = (title, up, label) =>
     <a class="icon-btn" href="${up}" aria-label="${esc(label)}">${ic("x")}</a></div>`;
 function settingsView() {
   setPage({ title: "Inställningar" });
+  const sound = voiceChoice(site.passes.some(passMusic));
   view.innerHTML = `
     ${pageHead("Inställningar", "#/", "Stäng inställningar")}
-    <section class="settings-group">
-      <h2 class="section-title">Röst under passet</h2>
-      ${voiceChoice(site.passes.some((p) => p.music))}
-    </section>
+    ${
+      sound
+        ? `<section class="settings-group">
+            <h2 class="section-title">${modes().length > 1 ? "Röst under passet" : "Musik"}</h2>
+            ${sound}
+          </section>`
+        : ""
+    }
     <section class="settings-group">
       <h2 class="section-title">Utseende</h2>
       ${themeChoice()}
@@ -265,14 +257,14 @@ function settingsView() {
         : ""
     }
     <ul class="list settings-links">
-      <li><a class="row" href="#/installera"><div><div class="name">${esc(site.install.title)}</div></div>${arrow}</a></li>
+      ${INSTALL_OPEN ? `<li><a class="row" href="#/installera"><div><div class="name">${esc(site.install.title)}</div></div>${arrow}</a></li>` : ""}
       <li><a class="row" href="#/installningar/integritet"><div><div class="name">${esc(site.privacy.link)}</div></div>${arrow}</a></li>
       <li>${feedbackRow()}</li>
     </ul>
     ${musicCredits()}
     ${
       TESTER
-        ? `<p class="tester-note">Testläge: live-coachen är på för den här telefonen. <a href="?tester=off#/installningar">Stäng av</a></p>`
+        ? `<p class="tester-note">Testläge: röst, musik och live-coachen är på för den här telefonen. <a href="?tester=off#/installningar">Stäng av</a></p>`
         : // an app saved to the iPhone home screen has its own storage and no address bar,
           // so ?tester=… can't reach it – the code can be typed here instead
           `<details class="tester-note"><summary>Testkod</summary>
@@ -297,7 +289,7 @@ function passView(p) {
       <h1 class="page-title">${esc(p.title)}</h1>
       <p class="lead">${list.length} övningar. Gör dem i ordning.</p>
       <button class="btn start-btn" data-start="${p.id}">${ic("play")}Starta pass</button>
-      ${voiceChoice(!!p.music)}
+      ${voiceChoice(passMusic(p))}
     </div>
     ${exerciseRows(list, `#/pass/${p.id}`, true)}`;
 }
@@ -391,8 +383,8 @@ document.addEventListener("click", (e) => {
 // ---------- Glossary word sheet ----------
 const SHEETS = {
   mode: {
-    title: () => (run?.pass.music ? "Röst och musik" : "Röst under passet"),
-    body: () => modePicker() + (run?.pass.music ? `<div class="sheet-music">${musicSwitch()}</div>` : ""),
+    title: () => (modes().length < 2 ? "Musik" : passMusic(run?.pass) ? "Röst och musik" : "Röst under passet"),
+    body: () => (modes().length > 1 ? modePicker() : "") + (passMusic(run?.pass) ? `<div class="sheet-music">${musicSwitch()}</div>` : ""),
   },
   consent: {
     title: () => site.privacy.live.title,
@@ -554,6 +546,10 @@ function wireVideos() {
 }
 
 // ---------- Installera appen ----------
+// Off until the app has its own domain: a saved app stays tied to the address it was
+// saved from, so everyone who installs on workers.dev would have to remove it and add it
+// again after the move. The guide still opens at #/installera for review.
+const INSTALL_OPEN = false;
 const standalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 // phones and tablets – where "add to home screen" means something
@@ -601,7 +597,7 @@ const BANNER_KEY = "jkk-install-banner";
 function installBanner() {
   let hidden = false;
   try { hidden = localStorage.getItem(BANNER_KEY) === "hidden"; } catch {}
-  if (standalone() || hidden || !isMobile()) return "";
+  if (!INSTALL_OPEN || standalone() || hidden || !isMobile()) return "";
   const b = site.install.banner;
   return `<section class="install-banner" aria-label="${esc(site.install.title)}">
       <span class="row-icon">${ic("download")}</span>
@@ -694,13 +690,22 @@ const TESTER = (() => {
 })();
 const LIVE = !!TESTER || ["localhost", "127.0.0.1"].includes(location.hostname);
 
+// ---- First release: no sound for students ----
+// The recorded voice and the background music come back one at a time: set these
+// to true (and SOUND_CACHE in sw.js, so they work offline). The test phone and
+// localhost keep everything, live coach included.
+const VOICE_OPEN = false;
+const MUSIC_OPEN = false;
+const VOICE = VOICE_OPEN || LIVE;
+const MUSIC = MUSIC_OPEN || LIVE;
+
 // ---- Voice mode: the student's choice, remembered on this phone ----
 const MODES = [
   { id: "silent", label: "Tyst", sub: "Bara bilder och text", icon: "sound-off" },
   { id: "recorded", label: "Inspelad röst", sub: "Fungerar utan internet", icon: "sound" },
   { id: "live", label: "Live-coach", sub: "Prata med coachen · kräver internet", icon: "waveform" },
 ];
-const modes = () => (LIVE ? MODES : MODES.filter((m) => m.id !== "live"));
+const modes = () => MODES.filter((m) => m.id === "silent" || (m.id === "recorded" && VOICE) || (m.id === "live" && LIVE));
 const prefs = (() => {
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem("jkk-voice") || "{}"); } catch {}
@@ -714,8 +719,9 @@ const savePrefs = () => { try { localStorage.setItem("jkk-voice", JSON.stringify
 // Live mode can be replaced for this session only (the saved choice stays):
 // "recorded" when the coach couldn't connect, "silent" when the student closed the consent sheet.
 let sessionMode = null;
-// A phone that chose live and no longer has the test code is silent.
-const mode = () => (prefs.mode !== "live" ? prefs.mode : LIVE ? sessionMode || "live" : "silent");
+// A choice that isn't offered any more (no test code, or the voice is switched off) is silent.
+const mode = () =>
+  !modes().some((m) => m.id === prefs.mode) ? "silent" : prefs.mode === "live" ? sessionMode || "live" : prefs.mode;
 const currentMode = () => MODES.find((m) => m.id === mode());
 const voiceOn = () => mode() === "recorded";   // the recorded voice (the live coach has its own)
 
@@ -723,7 +729,10 @@ const voiceOn = () => mode() === "recorded";   // the recorded voice (the live c
 // Its own on/off switch, on by default. Not with the live coach for now: the
 // microphone would hear the music.
 const music = createMusic();
-const musicFor = (p) => (prefs.music && mode() !== "live" && p?.music) || null;
+const passMusic = (p) => MUSIC && !!p?.music;
+const musicFor = (p) => (passMusic(p) && prefs.music && mode() !== "live" && p.music) || null;
+// anything to choose for this pass: a voice, or its music on/off
+const soundChoice = (p) => modes().length > 1 || passMusic(p);
 // make the music match the session: start it (after the pass's delay the
 // first time), resume it after a pause, or stop it
 function syncMusic(delay) {
@@ -736,7 +745,7 @@ const musicSwitch = () =>
   `<button class="music-switch" role="switch" data-music aria-checked="${prefs.music}">${ic("music")}Musik<span class="music-state" aria-hidden="true">${prefs.music ? "På" : "Av"}</span></button>`;
 // Pixabay asks for a credit line: one per track, in Inställningar
 function musicCredits() {
-  const tracks = new Map(site.passes.filter((p) => p.music?.credit).map((p) => [p.music.file, p.music.credit]));
+  const tracks = new Map(site.passes.filter((p) => passMusic(p) && p.music.credit).map((p) => [p.music.file, p.music.credit]));
   return [...tracks.values()].map((c) =>
     `<p class="credits">Musik av <a href="${esc(c.byUrl)}" target="_blank" rel="noopener">${esc(c.by)}</a> från <a href="${esc(c.fromUrl)}" target="_blank" rel="noopener">${esc(c.from)}</a>.</p>`
   ).join("");
@@ -751,16 +760,19 @@ function modePicker() {
 }
 // The pass page's small version: a segmented control under Starta pass,
 // with the chosen mode's one-line description below it.
-// withMusic: show the music switch next to it (the pass, or in settings any pass, has music)
+// withMusic: show the music switch next to it (the pass, or in settings any pass, has music).
+// Empty when there's nothing to choose (only Tyst, no music).
 function voiceChoice(withMusic) {
+  const choose = modes().length > 1;
+  if (!choose && !withMusic) return "";
   return `<div class="voice-choice">
       <div class="voice-row">
-        <div class="segmented" role="radiogroup" aria-label="Röst under passet">${modes().map(
+        ${choose ? `<div class="segmented" role="radiogroup" aria-label="Röst under passet">${modes().map(
           (m) => `<button role="radio" data-mode="${m.id}" aria-checked="${m.id === mode()}">${ic(m.icon)}${esc(m.label)}</button>`
-        ).join("")}</div>
+        ).join("")}</div>` : ""}
         ${withMusic ? musicSwitch() : ""}
       </div>
-      <p class="mode-hint">${esc(currentMode().sub)}</p>
+      ${choose ? `<p class="mode-hint">${esc(currentMode().sub)}</p>` : ""}
     </div>`;
 }
 const modeButton = () =>
@@ -987,7 +999,7 @@ function renderStep() {
     <div class="run">
       <div class="run-top">
         <div class="run-count">${esc(p.title)} · ${i + 1} av ${n}</div>
-        ${modeButton()}
+        ${soundChoice(p) ? modeButton() : ""}
         <button class="icon-btn" data-act="end" aria-label="Avsluta passet">${ic("x")}</button>
       </div>
       <div class="run-progress" aria-hidden="true">${list.map((_, k) => `<span class="${k < i ? "done" : k === i ? "now" : ""}"></span>`).join("")}</div>

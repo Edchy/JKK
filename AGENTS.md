@@ -14,7 +14,7 @@ A PWA for students of Järna Kung Fu & Kultur: home-training exercises with illu
 | Path | What |
 |---|---|
 | `app/` | The PWA. Static files, no build step. **Everything here is public** – never put secrets in it. |
-| `app/content/*.json` | All content: `exercises.json` (library), `index.json` (animals, tags, passes, principles, session coach framing, `privacy` texts + live consent), `ordbok.json` (glossary). Single source of truth for the app *and* the voice coach. |
+| `app/content/*.json` | All content: `exercises.json` (library), `index.json` (tags, passes, animals (hidden for now), principles, session coach framing, `privacy` texts + live consent), `ordbok.json` (glossary). Single source of truth for the app *and* the voice coach. |
 | `app/app.js` | Hash router (`route()`), all views, the guided session (`#/kor/<pass>`). |
 | `app/speech.js` | What the recorded session coach says (shared by app and recorder). |
 | `app/voice.js` | Speaker for the recorded session: plays clips; a line without a clip is silent (no device voice, on purpose). No microphone – the student taps Nästa. |
@@ -48,7 +48,11 @@ npx wrangler@4 deploy      # publishes app/ + worker.js to Cloudflare
 
 Secrets live in Cloudflare (`npx wrangler@4 secret put …`): `ELEVENLABS_SERVER_KEY`, `ELEVENLABS_AGENT_ID`, `TESTER_KEY`.
 
-**The live coach is in test mode.** Online, students choose between Tyst (the default) and Inspelad röst; no live coach, no consent sheet. The owner's phone turns the live coach on with the test code: open the app once with `?tester=<TESTER_KEY>`, or type it under Inställningar → Testkod (needed for an app saved to the iPhone home screen, which has its own storage). `?tester=off` removes it. The real lock for the live coach is in `worker.js`: no matching `X-Tester` header, no ticket. On localhost the live coach is always on; open `http://[::1]:4174` to see the student version.
+**Installing is switched off** (`INSTALL_OPEN` in `app.js`) until the app moves to its own domain: no Hem banner, no Inställningar link. A saved app is tied to the address it was saved from, so installs on `workers.dev` would have to be redone after the move. The guide still opens at `#/installera`. When the domain is live, set `INSTALL_OPEN = true`.
+
+**First release: no sound for students.** Voice and music are switched off for students (`VOICE_OPEN` / `MUSIC_OPEN` in `app.js`, `SOUND_CACHE` in `sw.js`): passes are pictures and text, with no voice or music controls, and the ~3 MB of clips and music isn't downloaded. They come back one at a time by flipping those switches (`SOUND_CACHE` too, so they work offline).
+
+**The live coach is in test mode.** Students get no live coach and no consent sheet. The owner's phone turns on everything (recorded voice, music and the live coach) with the test code: open the app once with `?tester=<TESTER_KEY>`, or type it under Inställningar → Testkod (needed for an app saved to the iPhone home screen, which has its own storage). `?tester=off` removes it. The real lock for the live coach is in `worker.js`: no matching `X-Tester` header, no ticket. On localhost everything is always on; open `http://[::1]:4174` to see the student version.
 
 ## Gotchas
 

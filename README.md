@@ -18,13 +18,15 @@ If the address ever changes, update `og:image` in `app/index.html` too (link pre
 
 - **`app/content/exercises.json`** – the library. Every exercise lives here once.
 - **`app/content/ordbok.json`** – the glossary ("Ordbok"). Add `{ "term": …, "text": … }` (optional `"native": "馬步"`); it is sorted alphabetically automatically.
-- **`app/content/index.json`** – the three animals (Apa = rörlighet, Björn = styrka, Tiger = färdighet), the filter tags, the ready-made passes, and the "Innan du börjar" text. Also the small texts around the app:
+- **`app/content/index.json`** – the filter tags, the ready-made passes, and the "Innan du börjar" text. Also the three animals (Apa = rörlighet, Björn = styrka, Tiger = färdighet), hidden in the app for now but kept for later. Also the small texts around the app:
   - `members` – the line at the bottom of Hem ("Appen är till för medlemmar …") with a link to the club's site.
   - `privacy` – the Integritet page. A section with `"liveOnly": true` shows only when the live coach is unlocked; a section can have a `link: { text, url }` shown under its text.
   - `feedback` – the "Fel eller förslag?" row in Inställningar: opens the student's mail app to `email` with `subject` and `body` filled in.
 - **`app/img/<exercise-id>-<n>.webp`** – the illustrations, exactly as in the PDFs.
 
-Students browse by animal (with tag filters) or open a pass and go through it in order.
+Students browse the library (filtered by tag) or open a pass and go through it in order.
+
+Exercise names and tag names are in English; everything that teaches – subtitle, steps, notes – is in Swedish.
 
 ### Exercise fields
 
@@ -32,8 +34,8 @@ Students browse by animal (with tag filters) or open a pass and go through it in
 |---|---|
 | `id` | must match image names (`<id>-1.webp`, `<id>-2.webp`…) |
 | `name`, `subtitle` | |
-| `animals` | one or more of `apa`, `bjorn`, `tiger` |
-| `tags` | ids from `tags` in index.json (`stretch`, `bal`, `mabu`, `sparkar`, `slag`, `stav`) |
+| `animals` | one or more of `apa`, `bjorn`, `tiger` – not shown in the app for now |
+| `tags` | ids from `tags` in index.json (`stretch`, `mobility`, `core`, `strength`, `stance`, `kick`, `punch`, `combo`, `staff`) |
 | `images` | number of illustrations; `0` = video-only exercise |
 | `video`, `extraVideos` | YouTube ids |
 | `steps` | optional; text per numbered picture in the illustration, e.g. `{ "bild": [3, 4], "title": …, "text": … }` |

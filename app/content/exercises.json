@@ -2,7 +2,7 @@
   "exercises": [
     {
       "id": "wide-stance",
-      "name": "Wide stance",
+      "name": "Wide Stance",
       "subtitle": "Dynamisk stretch för ljumskarna",
       "animals": [
         "apa"
@@ -68,7 +68,7 @@
     },
     {
       "id": "sidostretch",
-      "name": "Sidostretch",
+      "name": "Side Stretch",
       "subtitle": "Dynamisk stretch för underkroppen",
       "animals": [
         "apa"
@@ -89,14 +89,14 @@
     },
     {
       "id": "swinging-front-kicks",
-      "name": "Swinging front kicks",
+      "name": "Swinging Front Kicks",
       "subtitle": "Raka bensving framåt",
       "animals": [
         "apa"
       ],
       "tags": [
         "stretch",
-        "sparkar"
+        "kick"
       ],
       "images": 1,
       "dose": "10 svingar per ben",
@@ -115,12 +115,14 @@
     },
     {
       "id": "knacirklar",
-      "name": "Knäcirklar",
+      "name": "Knee Circles",
       "subtitle": "Rörlighet för höfterna",
       "animals": [
         "apa"
       ],
-      "tags": [],
+      "tags": [
+        "mobility"
+      ],
       "images": 1,
       "dose": "5 cirklar åt varje håll per ben",
       "video": "i1k6rq46y4M",
@@ -140,7 +142,8 @@
         "bjorn"
       ],
       "tags": [
-        "bal"
+        "core",
+        "strength"
       ],
       "images": 1,
       "dose": "1 minut",
@@ -160,20 +163,26 @@
     },
     {
       "id": "mabu-med-sidoslag",
-      "name": "Mabu med sidoslag",
+      "name": "Mabu with Side Strikes",
       "subtitle": "Svepande rörelse från sida till sida",
       "animals": [
         "bjorn",
         "tiger"
       ],
       "tags": [
-        "mabu",
-        "slag",
-        "stav"
+        "strength",
+        "stance",
+        "staff"
       ],
       "images": 1,
       "dose": "1 minut",
       "video": "KdORdTGO7UE",
+      "extraVideos": [
+        {
+          "id": "hRCo_iQejIs",
+          "title": "Se video 2"
+        }
+      ],
       "text": [
         "Stå med fötterna brett isär och riktade rakt framåt. Böj knäna till en djup Mabu, men bara så djupt att du kan hålla ryggen rak och överkroppen upprätt utan att luta framåt. Låt knäna följa tårnas riktning.",
         "Höj händerna åt sidan som på bilden. Andas in och aktivera bålen och bäckenet lätt. Börja rörelsen med en aktivering och rotation i höften. Låt överkroppen och armarna följa med i ett kontrollerat, svepande sidoslag i horisontell riktning. Andas ut samtidigt som du slår.",
@@ -187,7 +196,9 @@
       "animals": [
         "bjorn"
       ],
-      "tags": [],
+      "tags": [
+        "strength"
+      ],
       "images": 1,
       "dose": "1 minut",
       "text": [
@@ -256,7 +267,7 @@
       ],
       "tags": [
         "stretch",
-        "sparkar"
+        "kick"
       ],
       "images": 1,
       "video": "O8e1B53smUk",
@@ -307,7 +318,8 @@
         "bjorn"
       ],
       "tags": [
-        "bal"
+        "mobility",
+        "core"
       ],
       "images": 1,
       "video": "LqQs47S0yC4",
@@ -363,9 +375,9 @@
         "tiger"
       ],
       "tags": [
-        "mabu",
-        "slag",
-        "stav"
+        "strength",
+        "stance",
+        "staff"
       ],
       "images": 2,
       "dose": "30–60 sekunder per set",
@@ -429,7 +441,8 @@
         "bjorn"
       ],
       "tags": [
-        "bal"
+        "mobility",
+        "core"
       ],
       "images": 0,
       "video": "7cUaLmelvUk",
@@ -446,8 +459,9 @@
         "tiger"
       ],
       "tags": [
-        "mabu",
-        "stav"
+        "strength",
+        "stance",
+        "staff"
       ],
       "images": 0,
       "video": "s02_pJAFb1w",
@@ -456,53 +470,134 @@
       ]
     },
     {
-      "id": "dynamic-squat-mabu",
-      "name": "Dynamic Squat: Mabu & Side Strikes",
-      "subtitle": "Dynamisk mabu med sidoslag",
-      "animals": [
-        "bjorn",
-        "tiger"
-      ],
-      "tags": [
-        "mabu",
-        "slag"
-      ],
-      "images": 0,
-      "video": "hRCo_iQejIs",
-      "text": [
-        "Följ genomgången i videon. Behåll en upprätt rygg genom hela rörelsen och låt knäna följa tårnas riktning. Stå högre om du behöver."
-      ]
-    },
-    {
       "id": "kickups-stretches",
       "name": "Kickups & Stretches",
-      "subtitle": "Uppvärmning för bål och rörlighet",
+      "subtitle": "Bål och rörlighet",
       "animals": [
         "apa",
         "bjorn"
       ],
       "tags": [
-        "bal",
-        "stretch"
+        "stretch",
+        "core"
       ],
-      "images": 0,
+      "images": 1,
       "video": "4ldXz_c49xk",
+      "steps": [
+        {
+          "bild": [
+            1,
+            2
+          ],
+          "title": "Samla kroppen och sparka upp",
+          "text": "Ligg på rygg och dra knäna mot bröstkorgen. Tryck ländryggen mjukt mot golvet. Sträck ut benen, dra in dem igen och sparka i rörelsen upp mot taket. Låt höften lyfta med kontroll och bär vikten över övre ryggen och skuldrorna, inte på nacken. Bild 2 visar riktningen uppåt - stanna inte i ett statiskt läge."
+        },
+        {
+          "bild": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "title": "Rulla fram till stretch",
+          "text": "Använd återvägen för att rulla fram till sittande och sträcka mjukt. Återvänd till rullningen och uppåtsparken mellan stretchpositionerna. Arbeta dynamiskt utan att studsa eller pressa."
+        },
+        {
+          "bild": [
+            3
+          ],
+          "title": "Båda benen raka",
+          "text": "Fäll fram över båda raka benen."
+        },
+        {
+          "bild": [
+            4
+          ],
+          "title": "Ett ben inböjt",
+          "text": "Böj in ena benet och fäll fram över det andra, raka benet. Växla sida."
+        },
+        {
+          "bild": [
+            5
+          ],
+          "title": "Benen isär",
+          "text": "Öppna de raka benen åt sidorna och fäll fram mellan dem."
+        },
+        {
+          "bild": [
+            6
+          ],
+          "title": "Sträck sätet",
+          "text": "Vik in ett ben framför kroppen och sträck det andra bakåt. Luta dig fram för att sträcka sätet. Växla sida."
+        },
+        {
+          "bild": [
+            7
+          ],
+          "title": "Lågt utfall",
+          "text": "Kom fram i ett lågt utfall med bakre knät i golvet. För höften mjukt framåt för att sträcka höftböjare och ljumskar. Växla sida."
+        },
+        {
+          "bild": [
+            8
+          ],
+          "title": "Res dig med båda benen",
+          "text": "Rulla bakåt och sedan fram till djup huk. Sätt båda fötterna i golvet, sträck armarna framåt som motvikt och res dig kontrollerat."
+        },
+        {
+          "bild": [
+            9
+          ],
+          "title": "Res dig med ett ben i taget",
+          "text": "Rulla fram och samla ena foten nära rumpan. Håll det andra benet framsträckt och res dig med stödbenet. Den främre hälen kan vila lätt mot golvet för balans. Växla ben och ta stöd med händerna vid behov."
+        }
+      ],
       "text": [
-        "Följ genomgången i videon. Rör dig mjukt och kontrollerat, och anpassa rörelsen efter din nivå."
+        "Andas genom hela serien. Andas gärna ut när du samlar knäna och aktiverar magen."
       ]
     },
     {
       "id": "cobra-pushups",
       "name": "Cobra Pushups",
-      "subtitle": "Armhävningar med kobran",
+      "subtitle": "Styrka i överkroppen och bålkontroll",
       "animals": [
         "bjorn"
       ],
-      "tags": [],
-      "images": 0,
+      "tags": [
+        "core",
+        "strength"
+      ],
+      "images": 1,
       "video": "6ywYkrYwAes",
+      "steps": [
+        {
+          "bild": [
+            1
+          ],
+          "title": "Utgångsläge",
+          "text": "Placera händerna ungefär axelbrett och fötterna brett isär. Lyft höften uppåt och bakåt till ett uppochnedvänt V. Sträck armarna."
+        },
+        {
+          "bild": [
+            2,
+            3
+          ],
+          "title": "Dyk framåt och öppna upp",
+          "text": "Böj armbågarna bakåt och för huvudet och bröstkorgen nära golvet, som under ett lågt hinder. Låt höften följa ned. Pressa genom händerna, sträck armarna och lyft bröstkorgen framåt och uppåt. Håll axlarna borta från öronen."
+        },
+        {
+          "bild": [
+            4,
+            5,
+            6
+          ],
+          "title": "Vänd samma väg tillbaka",
+          "text": "Böj armbågarna och sänk bröstkorgen nära golvet igen. För kroppen bakåt genom samma låga passage. Lyft sedan höften uppåt och bakåt och sträck armarna till utgångsläget."
+        }
+      ],
       "text": [
-        "Följ genomgången i videon. Rör dig mjukt och kontrollerat, och anpassa rörelsen efter din nivå."
+        "Andas ut bild 1-3 och andas in bild 3-6."
       ]
     },
     {
@@ -513,13 +608,53 @@
         "tiger"
       ],
       "tags": [
-        "slag",
-        "sparkar"
+        "kick",
+        "punch",
+        "combo"
       ],
       "images": 1,
       "video": "GaVzLQ05Uqw",
+      "focus": "Bygg på kombinationen - sista attacken är den hårda.",
+      "steps": [
+        {
+          "bild": [
+            1,
+            2,
+            3
+          ],
+          "title": "Hård step-in jab",
+          "text": "Stå med vänster fot fram. Kliv ihop lite med höger fot. Ta sedan ett stort steg fram med vänster fot och slå samtidigt en hård, stötande jab med vänster hand. Låt förflyttningen ge kraft och håll höger hand i gard."
+        },
+        {
+          "bild": [
+            3,
+            4
+          ],
+          "title": "Jab + cross",
+          "text": "Gör jabben lättare och snabbare. Följ med en hård cross med bakre handen. Låt fot, höft och överkropp följa rotationen."
+        },
+        {
+          "bild": [
+            3,
+            4,
+            5
+          ],
+          "title": "Jab + cross + low kick",
+          "text": "Använd slagen som distraktion och avsluta med en kraftfull låg spark. Återgå till en stabil gard."
+        },
+        {
+          "bild": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "title": "Jab + cross + låg fint till hög spark",
+          "text": "Slå jab och cross. Påbörja en låg spark som fint och ändra sedan riktning med samma ben till en hög spark. Den höga sparken blir avslutningen."
+        }
+      ],
       "text": [
-        "Följ genomgången i videon. Rör dig mjukt och kontrollerat, och anpassa rörelsen efter din nivå."
+        "Börja långsamt. Andas ut kort vid attackerna. Anpassa sparkhöjden och dra tillbaka slag och sparkar snabbt till gard position."
       ]
     }
   ]

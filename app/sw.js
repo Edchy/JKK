@@ -2,8 +2,12 @@
 // content and images. Afterwards serves from cache and refreshes in the
 // background, so new exercises show up on the next visit.
 // Bump VERSION when app.js / style.css / index.html change.
-const VERSION = "v78";
+const VERSION = "v81";
 const CACHE = `jkk-${VERSION}`;
+// Students have no sound in the first release (VOICE_OPEN / MUSIC_OPEN in app.js), so
+// the ~3 MB of voice clips and music isn't downloaded up front. The test phone still
+// gets each clip from the network as it plays. Set to true when either comes back.
+const SOUND_CACHE = false;
 // The UI icons are only referenced from style.css (--i-*), so the cache can't
 // discover them: without this list, offline shows only the ones a page
 // happened to load while online (e.g. no cog on Hem).
@@ -36,6 +40,7 @@ async function contentUrls() {
   for (const ex of lib.exercises) {
     for (let n = 1; n <= (ex.images || 0); n++) urls.push(`img/${ex.id}-${n}.webp`);
   }
+  if (!SOUND_CACHE) return urls;
   // background music (passes[].music in index.json) – optional
   try {
     const { passes = [] } = await (await fetch("content/index.json", { cache: "no-store" })).json();
